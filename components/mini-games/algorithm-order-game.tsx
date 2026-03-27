@@ -5,6 +5,7 @@ import { ArrowDown, ArrowUp } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 const initialSteps = [
   "Надеть рюкзак",
@@ -24,7 +25,7 @@ const correctOrder = [
 
 export function AlgorithmOrderGame({ onSuccess }: { onSuccess: () => void }) {
   const [steps, setSteps] = useState(initialSteps);
-  const [message, setMessage] = useState("");
+  const [feedback, setFeedback] = useState<null | { tone: "success" | "error"; text: string }>(null);
 
   const isCorrect = useMemo(
     () => steps.every((step, index) => step === correctOrder[index]),
@@ -46,10 +47,13 @@ export function AlgorithmOrderGame({ onSuccess }: { onSuccess: () => void }) {
 
   function check() {
     if (isCorrect) {
-      setMessage("Алгоритм собран верно. Порядок шагов точный.");
+      setFeedback({ tone: "success", text: "Алгоритм собран верно. Порядок шагов точный." });
       onSuccess();
     } else {
-      setMessage("Есть ошибка в порядке. Подумай, что должно происходить раньше.");
+      setFeedback({
+        tone: "error",
+        text: "Есть ошибка в порядке. Подумай, что должно происходить раньше."
+      });
     }
   }
 
@@ -58,12 +62,12 @@ export function AlgorithmOrderGame({ onSuccess }: { onSuccess: () => void }) {
       <div className="grid gap-3">
         {steps.map((step, index) => (
           <Card key={step}>
-            <CardContent className="flex items-center justify-between gap-4 p-4">
-              <div>
+            <CardContent className="flex flex-col gap-4 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="min-w-0">
                 <p className="text-xs uppercase tracking-wide text-muted-foreground">Шаг {index + 1}</p>
                 <p className="font-semibold">{step}</p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex self-end gap-2 sm:self-auto">
                 <Button type="button" size="icon" variant="outline" onClick={() => move(index, -1)}>
                   <ArrowUp className="h-4 w-4" />
                 </Button>
@@ -76,7 +80,18 @@ export function AlgorithmOrderGame({ onSuccess }: { onSuccess: () => void }) {
         ))}
       </div>
       <Button onClick={check}>Проверить порядок</Button>
-      {message ? <p className="text-sm font-medium text-pop-ink">{message}</p> : null}
+      {feedback ? (
+        <p
+          className={cn(
+            "rounded-[20px] border px-4 py-3 text-sm font-medium text-pop-ink",
+            feedback.tone === "success"
+              ? "animate-success-pulse border-green-200 bg-green-50"
+              : "animate-error-shake border-red-200 bg-red-50"
+          )}
+        >
+          {feedback.text}
+        </p>
+      ) : null}
     </div>
   );
 }

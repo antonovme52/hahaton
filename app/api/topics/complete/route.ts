@@ -5,6 +5,7 @@ import { awardAchievementIfNeeded } from "@/lib/achievements";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { calculateLevelFromXp, getModuleProgress } from "@/lib/progress";
+import { grantStudentXp } from "@/lib/xp";
 
 const schema = z.object({
   topicId: z.string(),
@@ -41,8 +42,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ alreadyCompleted: true });
   }
 
-  const newXp = student.xp + topic.xpReward;
-  const newLevel = calculateLevelFromXp(newXp);
+  let newXp = student.xp;
+  let newLevel = calculateLevelFromXp(newXp);
 
   await prisma.$transaction(async (tx) => {
     await tx.topicProgress.upsert({
@@ -64,11 +65,23 @@ export async function POST(request: Request) {
       }
     });
 
+    const xpResult = await grantStudentXp(tx, {
+      studentId: student.id,
+      amount: topic.xpReward,
+      source: "topic",
+      sourceId: topic.id,
+      payload: {
+        topicId: topic.id,
+        topicTitle: topic.title
+      }
+    });
+
+    newXp = xpResult.xp;
+    newLevel = xpResult.level;
+
     await tx.studentProfile.update({
       where: { id: student.id },
       data: {
-        xp: newXp,
-        level: newLevel,
         currentModuleId: topic.moduleId,
         streak: {
           increment: 1

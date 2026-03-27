@@ -7,6 +7,7 @@ import { CheckCircle2, Sparkles, WandSparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { PracticeStage } from "@/components/mini-games/practice-stage";
+import { XpCounter } from "@/components/gamification/xp-counter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -323,12 +324,20 @@ export function TopicLearningExperience({
                                   ) : null}
                                 </div>
                                 {result ? (
-                                  <div className="rounded-[24px] bg-secondary p-4 text-secondary-foreground">
+                                  <div className="animate-success-pulse rounded-[24px] bg-secondary p-4 text-secondary-foreground">
                                     <div className="mb-2 flex items-center gap-2 font-semibold">
                                       <Sparkles className="h-5 w-5" />
                                       Тема завершена
                                     </div>
-                                    <p className="text-sm">XP: {result.xp}. Уровень: {result.level}.</p>
+                                    <div className="mb-3 flex flex-wrap gap-3">
+                                      <Badge variant="reward">
+                                        <XpCounter value={xpReward} prefix="+" suffix=" XP" />
+                                      </Badge>
+                                      <Badge variant="info">Уровень: {result.level}</Badge>
+                                    </div>
+                                    <p className="text-sm">
+                                      XP всего: <XpCounter value={result.xp} />.
+                                    </p>
                                     {result.unlocked.length ? (
                                       <p className="mt-2 text-sm">Новые достижения: {result.unlocked.join(", ")}.</p>
                                     ) : null}
