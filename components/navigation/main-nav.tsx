@@ -1,10 +1,14 @@
 import Link from "next/link";
 
+import { AppRole } from "@/lib/roles";
 import { cn } from "@/lib/utils";
 
 const studentLinks = [
   { href: "/dashboard/student", label: "Дашборд" },
   { href: "/modules", label: "Модули" },
+  { href: "/assignments", label: "Задания" },
+  { href: "/leaderboard", label: "Рейтинг" },
+  { href: "/programming/play", label: "Code Quest" },
   { href: "/profile", label: "Профиль" }
 ];
 
@@ -13,8 +17,14 @@ const parentLinks = [
   { href: "/parent/child-progress", label: "Прогресс ребенка" }
 ];
 
-export function MainNav({ role }: { role: "student" | "parent" }) {
-  const links = role === "student" ? studentLinks : parentLinks;
+const teacherLinks = [
+  { href: "/dashboard/teacher", label: "Кабинет" },
+  { href: "/teacher/assignments", label: "Задания" },
+  { href: "/leaderboard", label: "Рейтинг" }
+];
+
+export function MainNav({ role }: { role: AppRole }) {
+  const links = role === "student" ? studentLinks : role === "teacher" ? teacherLinks : parentLinks;
 
   return (
     <nav className="hidden items-center gap-2 md:flex">
@@ -23,7 +33,7 @@ export function MainNav({ role }: { role: "student" | "parent" }) {
           key={link.href}
           href={link.href}
           className={cn(
-            "rounded-full px-4 py-2 text-sm font-medium text-muted-foreground hover:bg-white hover:text-foreground"
+            "rounded-full px-5 py-3 text-base font-medium text-muted-foreground hover:bg-white hover:text-foreground"
           )}
         >
           {link.label}

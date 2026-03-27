@@ -5,6 +5,7 @@ import { awardAchievementIfNeeded } from "@/lib/achievements";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { calculateLevelFromXp } from "@/lib/progress";
+import { grantStudentXp } from "@/lib/xp";
 
 const schema = z.object({
   answers: z.array(z.number())
@@ -12,8 +13,9 @@ const schema = z.object({
 
 export async function POST(
   request: Request,
-  { params }: { params: { moduleSlug: string } }
+  { params }: { params: Promise<{ moduleSlug: string }> }
 ) {
+  const { moduleSlug } = await params;
   const session = await auth();
 
   if (!session?.user || session.user.role !== "student") {
@@ -27,7 +29,7 @@ export async function POST(
   });
 
   const learningModule = await prisma.module.findUniqueOrThrow({
-    where: { slug: params.moduleSlug },
+    where: { slug: moduleSlug },
     include: {
       quiz: {
         include: {
@@ -50,8 +52,8 @@ export async function POST(
   const score = Math.round((correctCount / learningModule.quiz.questions.length) * 100);
   const passed = score >= 70;
   const xpReward = passed ? 60 : 20;
-  const newXp = student.xp + xpReward;
-  const newLevel = calculateLevelFromXp(newXp);
+  let newXp = student.xp;
+  let newLevel = calculateLevelFromXp(newXp);
 
   await prisma.$transaction(async (tx) => {
     await tx.quizAttempt.create({
@@ -63,10 +65,25 @@ export async function POST(
       }
     });
 
+    const xpResult = await grantStudentXp(tx, {
+      studentId: student.id,
+      amount: xpReward,
+      source: "quiz",
+      sourceId: learningModule.quiz?.id || null,
+      payload: {
+        moduleSlug: learningModule.slug,
+        moduleTitle: learningModule.title,
+        score,
+        passed
+      }
+    });
+
+    newXp = xpResult.xp;
+    newLevel = xpResult.level;
+
     await tx.studentProfile.update({
       where: { id: student.id },
       data: {
-        xp: newXp,
         level: newLevel
       }
     });

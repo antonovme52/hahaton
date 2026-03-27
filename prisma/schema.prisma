@@ -10,6 +10,7 @@ datasource db {
 enum Role {
   student
   parent
+  teacher
 }
 
 enum ActivityType {
@@ -17,6 +18,36 @@ enum ActivityType {
   quiz_completed
   achievement_unlocked
   login
+  assignment_completed
+  programming_level_completed
+}
+
+enum AssignmentType {
+  multiple_choice
+  free_text
+  code_writing
+  bug_fix
+  code_order
+  code_gaps
+}
+
+enum AssignmentDifficulty {
+  easy
+  medium
+  hard
+}
+
+enum AssignmentStatus {
+  draft
+  published
+  archived
+}
+
+enum XpEventSource {
+  topic
+  quiz
+  teacher_assignment
+  programming_game
 }
 
 model User {
@@ -29,27 +60,32 @@ model User {
   updatedAt        DateTime            @updatedAt
   studentProfile   StudentProfile?
   parentProfile    ParentProfile?
+  teacherProfile   TeacherProfile?
   userAchievements UserAchievement[]
 
   @@map("users")
 }
 
 model StudentProfile {
-  id              String              @id @default(cuid())
-  userId          String              @unique
-  avatar          String?
-  xp              Int                 @default(0)
-  level           Int                 @default(1)
-  streak          Int                 @default(0)
-  currentModuleId String?
-  createdAt       DateTime            @default(now())
-  updatedAt       DateTime            @updatedAt
-  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
-  currentModule   Module?             @relation("CurrentModule", fields: [currentModuleId], references: [id], onDelete: SetNull)
-  parents         ParentStudentLink[]
-  topicProgress   TopicProgress[]
-  quizAttempts    QuizAttempt[]
-  activityLogs    ActivityLog[]
+  id                  String                    @id @default(cuid())
+  userId              String                    @unique
+  avatar              String?
+  xp                  Int                       @default(0)
+  level               Int                       @default(1)
+  streak              Int                       @default(0)
+  currentModuleId     String?
+  createdAt           DateTime                  @default(now())
+  updatedAt           DateTime                  @updatedAt
+  user                User                      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentModule       Module?                   @relation("CurrentModule", fields: [currentModuleId], references: [id], onDelete: SetNull)
+  parents             ParentStudentLink[]
+  topicProgress       TopicProgress[]
+  quizAttempts        QuizAttempt[]
+  activityLogs        ActivityLog[]
+  groupMemberships    GroupMembership[]
+  assignmentAttempts  TeacherAssignmentAttempt[]
+  xpEvents            XpEvent[]
+  programmingProgress ProgrammingGameProgress[]
 
   @@map("student_profiles")
 }
@@ -65,6 +101,19 @@ model ParentProfile {
   @@map("parent_profiles")
 }
 
+model TeacherProfile {
+  id          String              @id @default(cuid())
+  userId      String              @unique
+  headline    String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  user        User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  groups      Group[]
+  assignments TeacherAssignment[]
+
+  @@map("teacher_profiles")
+}
+
 model ParentStudentLink {
   id        String         @id @default(cuid())
   parentId  String
@@ -77,39 +126,69 @@ model ParentStudentLink {
   @@map("parent_student_links")
 }
 
+model Group {
+  id          String                   @id @default(cuid())
+  teacherId   String
+  name        String
+  slug        String
+  description String?
+  createdAt   DateTime                 @default(now())
+  updatedAt   DateTime                 @updatedAt
+  teacher     TeacherProfile           @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  members     GroupMembership[]
+  assignments TeacherAssignmentGroup[]
+
+  @@unique([teacherId, slug])
+  @@map("teacher_groups")
+}
+
+model GroupMembership {
+  id        String         @id @default(cuid())
+  groupId    String
+  studentId String
+  createdAt DateTime       @default(now())
+  group     Group          @relation(fields: [groupId], references: [id], onDelete: Cascade)
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([groupId, studentId])
+  @@map("group_memberships")
+}
+
 model Module {
-  id              String           @id @default(cuid())
-  slug            String           @unique
-  title           String
-  description     String
-  order           Int
-  icon            String
-  color           String
-  createdAt       DateTime         @default(now())
-  updatedAt       DateTime         @updatedAt
-  topics          Topic[]
-  quiz            Quiz?
-  studentsCurrent StudentProfile[] @relation("CurrentModule")
+  id                String              @id @default(cuid())
+  slug              String              @unique
+  title             String
+  description       String
+  order             Int
+  icon              String
+  color             String
+  createdAt         DateTime            @default(now())
+  updatedAt         DateTime            @updatedAt
+  topics            Topic[]
+  quiz              Quiz?
+  studentsCurrent   StudentProfile[]    @relation("CurrentModule")
+  teacherAssignments TeacherAssignment[]
 
   @@map("modules")
 }
 
 model Topic {
-  id             String          @id @default(cuid())
-  moduleId       String
-  slug           String
-  title          String
-  description    String
-  order          Int
-  lectureContent Json
-  practiceType   String
-  homeworkText   String
-  xpReward       Int
-  createdAt      DateTime        @default(now())
-  updatedAt      DateTime        @updatedAt
-  module         Module          @relation(fields: [moduleId], references: [id], onDelete: Cascade)
-  homework       Homework?
-  progress       TopicProgress[]
+  id                 String              @id @default(cuid())
+  moduleId           String
+  slug               String
+  title              String
+  description        String
+  order              Int
+  lectureContent     Json
+  practiceType       String
+  homeworkText       String
+  xpReward           Int
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  module             Module              @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  homework           Homework?
+  progress           TopicProgress[]
+  teacherAssignments TeacherAssignment[]
 
   @@unique([moduleId, slug])
   @@map("topics")
@@ -214,4 +293,94 @@ model ActivityLog {
   student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
 
   @@map("activity_logs")
+}
+
+model TeacherAssignment {
+  id          String                @id @default(cuid())
+  teacherId   String
+  moduleId    String?
+  topicId     String?
+  title       String
+  description String
+  assignmentType AssignmentType
+  difficulty  AssignmentDifficulty  @default(easy)
+  subjectLabel String?
+  status      AssignmentStatus      @default(draft)
+  xpReward    Int                   @default(40)
+  content     Json
+  publishedAt DateTime?
+  dueAt       DateTime?
+  createdAt   DateTime              @default(now())
+  updatedAt   DateTime              @updatedAt
+  teacher     TeacherProfile        @relation(fields: [teacherId], references: [id], onDelete: Cascade)
+  module      Module?               @relation(fields: [moduleId], references: [id], onDelete: SetNull)
+  topic       Topic?                @relation(fields: [topicId], references: [id], onDelete: SetNull)
+  groups      TeacherAssignmentGroup[]
+  attempts    TeacherAssignmentAttempt[]
+
+  @@index([teacherId, status])
+  @@index([moduleId, topicId])
+  @@map("teacher_assignments")
+}
+
+model TeacherAssignmentGroup {
+  id           String            @id @default(cuid())
+  assignmentId String
+  groupId      String
+  assignment   TeacherAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  group        Group             @relation(fields: [groupId], references: [id], onDelete: Cascade)
+
+  @@unique([assignmentId, groupId])
+  @@map("teacher_assignment_groups")
+}
+
+model TeacherAssignmentAttempt {
+  id              String            @id @default(cuid())
+  assignmentId    String
+  studentId       String
+  answer          Json
+  score           Int               @default(0)
+  isCorrect       Boolean           @default(false)
+  startedAt       DateTime
+  submittedAt     DateTime?
+  durationSeconds Int?
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @updatedAt
+  assignment      TeacherAssignment @relation(fields: [assignmentId], references: [id], onDelete: Cascade)
+  student         StudentProfile    @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([assignmentId, studentId])
+  @@map("teacher_assignment_attempts")
+}
+
+model XpEvent {
+  id        String         @id @default(cuid())
+  studentId String
+  source    XpEventSource
+  sourceId  String?
+  amount    Int
+  payload   Json
+  createdAt DateTime       @default(now())
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@index([studentId, createdAt])
+  @@map("xp_events")
+}
+
+model ProgrammingGameProgress {
+  id              String         @id @default(cuid())
+  studentId       String
+  levelKey        String
+  attempts        Int            @default(0)
+  bestScore       Int            @default(0)
+  completed       Boolean        @default(false)
+  hintsUsed       Int            @default(0)
+  lastDurationSec Int?
+  completedAt     DateTime?
+  createdAt       DateTime       @default(now())
+  updatedAt       DateTime       @updatedAt
+  student         StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, levelKey])
+  @@map("programming_game_progress")
 }

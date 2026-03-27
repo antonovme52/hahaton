@@ -10,7 +10,7 @@ const schema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(8),
-  role: z.enum(["student", "parent"])
+  role: z.enum(["student", "parent", "teacher"])
 });
 
 export async function POST(request: Request) {
@@ -39,6 +39,14 @@ export async function POST(request: Request) {
           body.role === "parent"
             ? {
                 create: {}
+              }
+            : undefined,
+        teacherProfile:
+          body.role === "teacher"
+            ? {
+                create: {
+                  headline: "Новый учитель Popub Learn"
+                }
               }
             : undefined
       }

@@ -50,14 +50,14 @@ export function LoginForm() {
     }
 
     router.refresh();
-    router.push("/dashboard/student");
+    router.push("/dashboard");
   }
 
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle>Вход в платформу</CardTitle>
-        <CardDescription>Войди как ученик или родитель и продолжай маршрут.</CardDescription>
+        <CardDescription>Войди как ученик, родитель или учитель и продолжай маршрут.</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>

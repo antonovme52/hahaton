@@ -135,6 +135,11 @@ export function InteractiveTaskRunner({
     setDragIndex(null);
   }
 
+  const timerLabel =
+    typeof remainingSec === "number" && remainingSec < 60
+      ? `${remainingSec} сек`
+      : formatDuration(remainingSec || 0);
+
   return (
     <div className="space-y-5">
       <Card className="overflow-hidden">
@@ -151,7 +156,7 @@ export function InteractiveTaskRunner({
                 )}
               >
                 <Clock3 className="h-4 w-4" />
-                {isExpired ? "Время вышло" : `Осталось ${formatDuration(remainingSec || 0)}`}
+                {isExpired ? "Время вышло" : `Осталось ${timerLabel}`}
               </Badge>
             ) : null}
             {hints.length ? <Badge variant="outline">Подсказки: {revealedHintCount}/{hints.length}</Badge> : null}

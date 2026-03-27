@@ -18,13 +18,13 @@ export function StatCard({
   return (
     <Card>
       <CardContent className="flex items-center gap-4 p-6">
-        <div className={`flex h-14 w-14 items-center justify-center rounded-3xl bg-gradient-to-br ${tone} text-white`}>
-          <Icon className="h-6 w-6" />
+        <div className={`flex h-16 w-16 items-center justify-center rounded-3xl bg-gradient-to-br ${tone} text-white`}>
+          <Icon className="h-7 w-7" />
         </div>
         <div>
-          <p className="text-sm text-muted-foreground">{label}</p>
-          <p className="text-2xl font-bold">{value}</p>
-          <p className="text-sm text-muted-foreground">{helper}</p>
+          <p className="text-base text-muted-foreground">{label}</p>
+          <p className="text-3xl font-bold">{value}</p>
+          <p className="text-base text-muted-foreground">{helper}</p>
         </div>
       </CardContent>
     </Card>

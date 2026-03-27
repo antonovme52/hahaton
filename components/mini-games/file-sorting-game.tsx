@@ -5,6 +5,7 @@ import { FolderOpen, RefreshCcw } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 const initialFiles = [
   { id: "f1", name: "math-homework.docx", target: "Учеба" },
@@ -17,7 +18,7 @@ const folders = ["Учеба", "Фото", "Проекты"] as const;
 
 export function FileSortingGame({ onSuccess }: { onSuccess: () => void }) {
   const [placements, setPlacements] = useState<Record<string, string>>({});
-  const [message, setMessage] = useState("");
+  const [feedback, setFeedback] = useState<null | { tone: "success" | "error"; text: string }>(null);
 
   const remaining = useMemo(
     () => initialFiles.filter((file) => !placements[file.id]),
@@ -34,16 +35,19 @@ export function FileSortingGame({ onSuccess }: { onSuccess: () => void }) {
   function check() {
     const success = initialFiles.every((file) => placements[file.id] === file.target);
     if (success) {
-      setMessage("Отлично! Все файлы разложены по правильным папкам.");
+      setFeedback({ tone: "success", text: "Отлично! Все файлы разложены по правильным папкам." });
       onSuccess();
     } else {
-      setMessage("Почти получилось. Проверь, где должны лежать учебные файлы и фото.");
+      setFeedback({
+        tone: "error",
+        text: "Почти получилось. Проверь, где должны лежать учебные файлы и фото."
+      });
     }
   }
 
   function reset() {
     setPlacements({});
-    setMessage("");
+    setFeedback(null);
   }
 
   return (
@@ -56,7 +60,7 @@ export function FileSortingGame({ onSuccess }: { onSuccess: () => void }) {
               key={file.id}
               draggable
               onDragStart={(event) => event.dataTransfer.setData("text/plain", file.id)}
-              className="cursor-grab rounded-2xl border bg-white px-4 py-3 text-sm font-semibold shadow-sm"
+              className="max-w-full cursor-grab break-all rounded-2xl border bg-white px-4 py-3 text-sm font-semibold shadow-sm"
             >
               {file.name}
             </div>
@@ -85,7 +89,10 @@ export function FileSortingGame({ onSuccess }: { onSuccess: () => void }) {
                   .map(([fileId]) => {
                     const file = initialFiles.find((entry) => entry.id === fileId);
                     return (
-                      <div key={fileId} className="rounded-2xl bg-accent/60 px-3 py-2 text-sm font-medium">
+                      <div
+                        key={fileId}
+                        className="rounded-2xl bg-accent/60 px-3 py-2 text-sm font-medium break-all"
+                      >
                         {file?.name}
                       </div>
                     );
@@ -102,7 +109,18 @@ export function FileSortingGame({ onSuccess }: { onSuccess: () => void }) {
           Сбросить
         </Button>
       </div>
-      {message ? <p className="text-sm font-medium text-pop-ink">{message}</p> : null}
+      {feedback ? (
+        <p
+          className={cn(
+            "rounded-[20px] border px-4 py-3 text-sm font-medium text-pop-ink",
+            feedback.tone === "success"
+              ? "animate-success-pulse border-green-200 bg-green-50"
+              : "animate-error-shake border-red-200 bg-red-50"
+          )}
+        >
+          {feedback.text}
+        </p>
+      ) : null}
     </div>
   );
 }

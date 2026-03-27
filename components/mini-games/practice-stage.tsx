@@ -9,9 +9,11 @@ import { SafetySortGame } from "@/components/mini-games/safety-sort-game";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 function SimpleCategoryGame({ onSuccess }: { onSuccess: () => void }) {
   const [selected, setSelected] = useState<Record<string, string>>({});
+  const [feedback, setFeedback] = useState<null | { tone: "success" | "error"; text: string }>(null);
   const cards = [
     ["Онлайн-урок", "Учеба"],
     ["Чат с друзьями", "Общение"],
@@ -21,7 +23,10 @@ function SimpleCategoryGame({ onSuccess }: { onSuccess: () => void }) {
   function check() {
     const success = cards.every(([label, type]) => selected[label] === type);
     if (success) {
+      setFeedback({ tone: "success", text: "Отлично! Категории выбраны верно." });
       onSuccess();
+    } else {
+      setFeedback({ tone: "error", text: "Есть неточность. Проверь, где учеба, общение и развлечения." });
     }
   }
 
@@ -46,12 +51,14 @@ function SimpleCategoryGame({ onSuccess }: { onSuccess: () => void }) {
         </Card>
       ))}
       <Button onClick={check}>Проверить</Button>
+      <PracticeFeedback feedback={feedback} />
     </div>
   );
 }
 
 function SimpleConditionGame({ onSuccess }: { onSuccess: () => void }) {
   const [picked, setPicked] = useState<string[]>([]);
+  const [feedback, setFeedback] = useState<null | { tone: "success" | "error"; text: string }>(null);
   const correct = ["Если идет дождь", "то беру зонт", "иначе иду без зонта"];
   const options = [...correct, "повторяю 5 раз"];
 
@@ -82,18 +89,23 @@ function SimpleConditionGame({ onSuccess }: { onSuccess: () => void }) {
           const success =
             picked.length === correct.length && correct.every((item) => picked.includes(item));
           if (success) {
+            setFeedback({ tone: "success", text: "Условие собрано верно." });
             onSuccess();
+          } else {
+            setFeedback({ tone: "error", text: "Порядок условия пока не совпал. Попробуй ещё раз." });
           }
         }}
       >
         Проверить
       </Button>
+      <PracticeFeedback feedback={feedback} />
     </div>
   );
 }
 
 function SimpleLoopGame({ onSuccess }: { onSuccess: () => void }) {
   const [picked, setPicked] = useState<string[]>([]);
+  const [feedback, setFeedback] = useState<null | { tone: "success" | "error"; text: string }>(null);
   const options = [
     "Чистить зубы каждый день",
     "Один раз открыть тетрадь",
@@ -127,12 +139,16 @@ function SimpleLoopGame({ onSuccess }: { onSuccess: () => void }) {
           const success =
             picked.length === correct.length && correct.every((item) => picked.includes(item));
           if (success) {
+            setFeedback({ tone: "success", text: "Верно! Ты нашёл действия, которые повторяются циклом." });
             onSuccess();
+          } else {
+            setFeedback({ tone: "error", text: "Не все действия относятся к циклу. Проверь выбор ещё раз." });
           }
         }}
       >
         Проверить цикл
       </Button>
+      <PracticeFeedback feedback={feedback} />
     </div>
   );
 }
@@ -180,5 +196,28 @@ export function PracticeStage({
         </Card>
       ) : null}
     </div>
+  );
+}
+
+function PracticeFeedback({
+  feedback
+}: {
+  feedback: null | { tone: "success" | "error"; text: string };
+}) {
+  if (!feedback) {
+    return null;
+  }
+
+  return (
+    <p
+      className={cn(
+        "rounded-[20px] border px-4 py-3 text-sm font-medium text-pop-ink",
+        feedback.tone === "success"
+          ? "animate-success-pulse border-green-200 bg-green-50"
+          : "animate-error-shake border-red-200 bg-red-50"
+      )}
+    >
+      {feedback.text}
+    </p>
   );
 }
