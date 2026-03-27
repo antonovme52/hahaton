@@ -1,0 +1,217 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  student
+  parent
+}
+
+enum ActivityType {
+  topic_completed
+  quiz_completed
+  achievement_unlocked
+  login
+}
+
+model User {
+  id               String              @id @default(cuid())
+  name             String
+  email            String              @unique
+  passwordHash     String
+  role             Role
+  createdAt        DateTime            @default(now())
+  updatedAt        DateTime            @updatedAt
+  studentProfile   StudentProfile?
+  parentProfile    ParentProfile?
+  userAchievements UserAchievement[]
+
+  @@map("users")
+}
+
+model StudentProfile {
+  id              String              @id @default(cuid())
+  userId          String              @unique
+  avatar          String?
+  xp              Int                 @default(0)
+  level           Int                 @default(1)
+  streak          Int                 @default(0)
+  currentModuleId String?
+  createdAt       DateTime            @default(now())
+  updatedAt       DateTime            @updatedAt
+  user            User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  currentModule   Module?             @relation("CurrentModule", fields: [currentModuleId], references: [id], onDelete: SetNull)
+  parents         ParentStudentLink[]
+  topicProgress   TopicProgress[]
+  quizAttempts    QuizAttempt[]
+  activityLogs    ActivityLog[]
+
+  @@map("student_profiles")
+}
+
+model ParentProfile {
+  id        String              @id @default(cuid())
+  userId    String              @unique
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+  user      User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  students  ParentStudentLink[]
+
+  @@map("parent_profiles")
+}
+
+model ParentStudentLink {
+  id        String         @id @default(cuid())
+  parentId  String
+  studentId String
+  createdAt DateTime       @default(now())
+  parent    ParentProfile  @relation(fields: [parentId], references: [id], onDelete: Cascade)
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@unique([parentId, studentId])
+  @@map("parent_student_links")
+}
+
+model Module {
+  id              String           @id @default(cuid())
+  slug            String           @unique
+  title           String
+  description     String
+  order           Int
+  icon            String
+  color           String
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  topics          Topic[]
+  quiz            Quiz?
+  studentsCurrent StudentProfile[] @relation("CurrentModule")
+
+  @@map("modules")
+}
+
+model Topic {
+  id             String          @id @default(cuid())
+  moduleId       String
+  slug           String
+  title          String
+  description    String
+  order          Int
+  lectureContent Json
+  practiceType   String
+  homeworkText   String
+  xpReward       Int
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
+  module         Module          @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  homework       Homework?
+  progress       TopicProgress[]
+
+  @@unique([moduleId, slug])
+  @@map("topics")
+}
+
+model Homework {
+  id          String   @id @default(cuid())
+  topicId     String   @unique
+  title       String
+  description String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  topic       Topic    @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@map("homeworks")
+}
+
+model Quiz {
+  id        String         @id @default(cuid())
+  moduleId  String         @unique
+  title     String
+  createdAt DateTime       @default(now())
+  updatedAt DateTime       @updatedAt
+  module    Module         @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  questions QuizQuestion[]
+  attempts  QuizAttempt[]
+
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id            String   @id @default(cuid())
+  quizId        String
+  question      String
+  options       Json
+  correctAnswer Int
+  order         Int
+  quiz          Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@map("quiz_questions")
+}
+
+model QuizAttempt {
+  id        String         @id @default(cuid())
+  quizId    String
+  studentId String
+  score     Int
+  passed    Boolean
+  createdAt DateTime       @default(now())
+  quiz      Quiz           @relation(fields: [quizId], references: [id], onDelete: Cascade)
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("quiz_attempts")
+}
+
+model TopicProgress {
+  id          String         @id @default(cuid())
+  studentId   String
+  topicId     String
+  completed   Boolean        @default(false)
+  completedAt DateTime?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+  student     StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  topic       Topic          @relation(fields: [topicId], references: [id], onDelete: Cascade)
+
+  @@unique([studentId, topicId])
+  @@map("topic_progress")
+}
+
+model Achievement {
+  id               String            @id @default(cuid())
+  code             String            @unique
+  title            String
+  description      String
+  icon             String
+  createdAt        DateTime          @default(now())
+  updatedAt        DateTime          @updatedAt
+  userAchievements UserAchievement[]
+
+  @@map("achievements")
+}
+
+model UserAchievement {
+  id            String      @id @default(cuid())
+  userId        String
+  achievementId String
+  unlockedAt    DateTime    @default(now())
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  achievement   Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, achievementId])
+  @@map("user_achievements")
+}
+
+model ActivityLog {
+  id        String         @id @default(cuid())
+  studentId String
+  type      ActivityType
+  payload   Json
+  createdAt DateTime       @default(now())
+  student   StudentProfile @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  @@map("activity_logs")
+}
