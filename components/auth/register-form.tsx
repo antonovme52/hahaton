@@ -17,7 +17,7 @@ const schema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(8),
-  role: z.enum(["student", "parent"])
+  role: z.enum(["student", "parent", "teacher"])
 });
 
 type FormValues = z.infer<typeof schema>;
@@ -81,15 +81,16 @@ export function RegisterForm() {
           </div>
           <div className="space-y-2">
             <Label>Роль</Label>
-            <div className="grid grid-cols-2 gap-3">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
               {[
                 ["student", "Ученик"],
-                ["parent", "Родитель"]
+                ["parent", "Родитель"],
+                ["teacher", "Учитель"]
               ].map(([value, label]) => (
                 <button
                   key={value}
                   type="button"
-                  onClick={() => form.setValue("role", value as "student" | "parent")}
+                  onClick={() => form.setValue("role", value as "student" | "parent" | "teacher")}
                   className={`rounded-2xl border px-4 py-3 text-sm font-semibold ${
                     form.watch("role") === value
                       ? "border-pop-coral bg-orange-50 text-pop-coral"

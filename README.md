@@ -31,7 +31,19 @@ npm install
 
 2. Создать `.env` по примеру `.env.example`.
 
-3. Поднять PostgreSQL и создать базу `popub_learn`.
+3. Поднять PostgreSQL через Docker:
+
+```bash
+docker compose up -d
+```
+
+Если контейнер уже был создан раньше, достаточно:
+
+```bash
+docker start postgres-popub
+```
+
+База `popub_learn` создается автоматически из `docker-compose.yml`.
 
 4. Сгенерировать Prisma Client:
 
@@ -42,17 +54,21 @@ npm run prisma:generate
 5. Применить миграции:
 
 ```bash
-npm run prisma:migrate
+npx prisma migrate deploy
 ```
 
-6. Заполнить базу seed-данными:
+6. При необходимости заполнить базу seed-данными:
 
 ```bash
 npm run prisma:seed
 ```
+
+Важно: текущий `seed.ts` перед заполнением очищает таблицы, поэтому не запускайте его на базе с нужными данными.
 
 7. Запустить dev-сервер:
 
 ```bash
 npm run dev
 ```
+
+Приложение будет доступно по адресу `http://localhost:3000`.

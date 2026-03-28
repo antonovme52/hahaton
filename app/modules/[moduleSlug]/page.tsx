@@ -13,13 +13,14 @@ import { requireRole } from "@/lib/permissions";
 export default async function ModuleDetailPage({
   params
 }: {
-  params: { moduleSlug: string };
+  params: Promise<{ moduleSlug: string }>;
 }) {
+  const { moduleSlug } = await params;
   const session = await requireRole("student");
   let moduleData: Awaited<ReturnType<typeof getModuleDetails>>;
 
   try {
-    moduleData = await getModuleDetails(session.user.id, params.moduleSlug);
+    moduleData = await getModuleDetails(session.user.id, moduleSlug);
   } catch {
     notFound();
   }

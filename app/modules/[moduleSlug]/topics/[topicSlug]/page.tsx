@@ -11,13 +11,14 @@ import { canAccessTopic } from "@/lib/progress";
 export default async function TopicPage({
   params
 }: {
-  params: { moduleSlug: string; topicSlug: string };
+  params: Promise<{ moduleSlug: string; topicSlug: string }>;
 }) {
+  const { moduleSlug, topicSlug } = await params;
   const session = await requireRole("student");
   let topicData: Awaited<ReturnType<typeof getTopicDetails>>;
 
   try {
-    topicData = await getTopicDetails(session.user.id, params.moduleSlug, params.topicSlug);
+    topicData = await getTopicDetails(session.user.id, moduleSlug, topicSlug);
   } catch {
     notFound();
   }
@@ -26,7 +27,7 @@ export default async function TopicPage({
   const allowed = await canAccessTopic(student.id, topic.id);
 
   if (!allowed) {
-    redirect(`/modules/${params.moduleSlug}`);
+    redirect(`/modules/${moduleSlug}`);
   }
 
   const lecture = topic.lectureContent as { blocks: { title: string; body: string }[] };
@@ -36,7 +37,7 @@ export default async function TopicPage({
     <AppShell role="student">
       <TopicLearningExperience
         moduleTitle={topic.module.title}
-        moduleSlug={params.moduleSlug}
+        moduleSlug={moduleSlug}
         topicId={topic.id}
         topicTitle={topic.title}
         topicDescription={topic.description}
@@ -52,7 +53,7 @@ export default async function TopicPage({
           <CardTitle>Навигация</CardTitle>
         </CardHeader>
         <CardContent>
-          <Link href={`/modules/${params.moduleSlug}`} className="inline-flex text-sm font-semibold text-pop-coral">
+          <Link href={`/modules/${moduleSlug}`} className="inline-flex text-sm font-semibold text-pop-coral">
             Вернуться к модулю
           </Link>
         </CardContent>

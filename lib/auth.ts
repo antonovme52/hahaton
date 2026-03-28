@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
 import { prisma } from "@/lib/prisma";
+import { type AppRole } from "@/lib/roles";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -71,7 +72,7 @@ export const authOptions: NextAuthOptions = {
     async session({ session, token }) {
       if (session.user) {
         session.user.id = token.sub || "";
-        session.user.role = (token.role as "student" | "parent") || "student";
+        session.user.role = (token.role as AppRole) || "student";
       }
       return session;
     }

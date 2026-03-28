@@ -11,13 +11,14 @@ import { canAccessQuiz } from "@/lib/progress";
 export default async function QuizPage({
   params
 }: {
-  params: { moduleSlug: string };
+  params: Promise<{ moduleSlug: string }>;
 }) {
+  const { moduleSlug } = await params;
   const session = await requireRole("student");
   let data: Awaited<ReturnType<typeof getQuizDetails>>;
 
   try {
-    data = await getQuizDetails(session.user.id, params.moduleSlug);
+    data = await getQuizDetails(session.user.id, moduleSlug);
   } catch {
     notFound();
   }
@@ -25,7 +26,7 @@ export default async function QuizPage({
   const access = await canAccessQuiz(data.student.id, data.module.id);
 
   if (!access) {
-    redirect(`/modules/${params.moduleSlug}`);
+    redirect(`/modules/${moduleSlug}`);
   }
 
   if (!data.quiz) {

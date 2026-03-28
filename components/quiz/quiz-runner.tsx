@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, Medal, RotateCcw } from "lucide-react";
 import { useRouter } from "next/navigation";
 
+import { XpCounter } from "@/components/gamification/xp-counter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 
 type QuizQuestion = {
   id: string;
@@ -52,28 +55,51 @@ export function QuizRunner({
 
   if (result) {
     return (
-      <Card className="bg-gradient-to-br from-white to-orange-50">
-        <CardContent className="space-y-4 p-6">
-          <div className="flex h-14 w-14 items-center justify-center rounded-3xl bg-secondary text-secondary-foreground">
-            {result.passed ? <CheckCircle2 className="h-7 w-7" /> : <RotateCcw className="h-7 w-7" />}
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold">
-              {result.passed ? "Тест пройден успешно" : "Попробуй еще раз"}
-            </h2>
-            <p className="text-muted-foreground">
-              Результат: {result.score}% • Награда: {result.xpReward} XP • Уровень: {result.level}
-            </p>
-          </div>
-          {result.rewards.length ? (
-            <Badge variant="reward" className="gap-2">
-              <Medal className="h-4 w-4" />
-              {result.rewards.join(", ")}
-            </Badge>
-          ) : null}
-          <Button onClick={() => setResult(null)}>Пройти снова</Button>
-        </CardContent>
-      </Card>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={result.passed ? "quiz-success" : "quiz-error"}
+          initial={{ opacity: 0, y: 18 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -12 }}
+          transition={{ duration: 0.3 }}
+        >
+          <Card
+            className={cn(
+              "bg-gradient-to-br",
+              result.passed
+                ? "animate-success-pulse border-green-200 from-white to-green-50"
+                : "animate-error-shake border-red-200 from-white to-red-50"
+            )}
+          >
+            <CardContent className="space-y-4 p-6">
+              <div
+                className={cn(
+                  "flex h-14 w-14 items-center justify-center rounded-3xl text-white",
+                  result.passed ? "bg-green-500" : "bg-red-500"
+                )}
+              >
+                {result.passed ? <CheckCircle2 className="h-7 w-7" /> : <RotateCcw className="h-7 w-7" />}
+              </div>
+              <div>
+                <h2 className="text-2xl font-bold">
+                  {result.passed ? "Тест пройден успешно" : "Попробуй еще раз"}
+                </h2>
+                <p className="text-muted-foreground">
+                  Результат: <XpCounter value={result.score} suffix="%" /> • Награда:{" "}
+                  <XpCounter value={result.xpReward} suffix=" XP" /> • Уровень: {result.level}
+                </p>
+              </div>
+              {result.rewards.length ? (
+                <Badge variant="reward" className="gap-2">
+                  <Medal className="h-4 w-4" />
+                  {result.rewards.join(", ")}
+                </Badge>
+              ) : null}
+              <Button onClick={() => setResult(null)}>Пройти снова</Button>
+            </CardContent>
+          </Card>
+        </motion.div>
+      </AnimatePresence>
     );
   }
 
@@ -104,7 +130,9 @@ export function QuizRunner({
                     })
                   }
                   className={`rounded-3xl border px-4 py-4 text-left font-medium ${
-                    answers[index] === optionIndex ? "border-pop-coral bg-orange-50" : "bg-white/80"
+                    answers[index] === optionIndex
+                      ? "animate-scale-in border-pop-coral bg-orange-50"
+                      : "animate-scale-in bg-white/80"
                   }`}
                 >
                   {option}
