@@ -1,4 +1,6 @@
-import { ActivityType } from "@prisma/client";
+import { ActivityType, Prisma } from "@prisma/client";
+
+import { prisma } from "@/lib/prisma";
 
 function getPayloadRecord(payload: unknown) {
   return payload && typeof payload === "object" && !Array.isArray(payload)
@@ -20,6 +22,89 @@ function getPayloadBoolean(payload: unknown, key: string) {
 
 function humanizeActivityType(type: ActivityType) {
   return type.replaceAll("_", " ");
+}
+
+type ActivityDbClient = Prisma.TransactionClient | typeof prisma;
+
+function startOfDay(date: Date) {
+  return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+}
+
+function dayDiff(from: Date, to: Date) {
+  const msPerDay = 24 * 60 * 60 * 1000;
+  return Math.round((startOfDay(from).getTime() - startOfDay(to).getTime()) / msPerDay);
+}
+
+export function calculateDailyStreakFromDates(dates: Date[], currentDate = new Date()) {
+  const uniqueDates = Array.from(
+    new Map(
+      [currentDate, ...dates].map((date) => {
+        const normalized = startOfDay(date);
+        return [normalized.toISOString(), normalized];
+      })
+    ).values()
+  ).sort((left, right) => right.getTime() - left.getTime());
+
+  let streak = 0;
+  let expectedDate = startOfDay(currentDate);
+
+  for (const date of uniqueDates) {
+    const diff = dayDiff(expectedDate, date);
+    if (diff === 0) {
+      streak += 1;
+      expectedDate = new Date(expectedDate.getFullYear(), expectedDate.getMonth(), expectedDate.getDate() - 1);
+      continue;
+    }
+
+    if (diff > 0) {
+      break;
+    }
+  }
+
+  return streak;
+}
+
+export async function logStudentActivity(
+  db: ActivityDbClient,
+  {
+    studentId,
+    type,
+    payload,
+    createdAt = new Date(),
+  }: {
+    studentId: string;
+    type: ActivityType;
+    payload: Prisma.InputJsonValue;
+    createdAt?: Date;
+  }
+) {
+  const recentActivity = await db.activityLog.findMany({
+    where: { studentId },
+    orderBy: { createdAt: "desc" },
+    take: 120,
+    select: { createdAt: true },
+  });
+
+  const nextStreak = calculateDailyStreakFromDates(
+    recentActivity.map((entry) => entry.createdAt),
+    createdAt
+  );
+
+  await db.studentProfile.update({
+    where: { id: studentId },
+    data: { streak: nextStreak },
+  });
+
+  await db.activityLog.create({
+    data: {
+      studentId,
+      type,
+      payload,
+      createdAt,
+    },
+  });
+
+  return nextStreak;
 }
 
 export function formatActivityLabel(activity: { type: ActivityType; payload: unknown }) {

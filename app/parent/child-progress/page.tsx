@@ -1,16 +1,16 @@
-import { AppShell } from "@/components/layout/app-shell";
-import { ParentChildLinkCard } from "@/components/parent/parent-child-link-card";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getAssignmentProgressMeta, getAssignmentProgressState } from "@/lib/assignments";
-import { formatActivityLabel } from "@/lib/activity";
-import { getParentOverview } from "@/lib/data";
-import { requireRole } from "@/lib/permissions";
-import { formatDate } from "@/lib/utils";
+import { AppShell } from "@/components/layout/app-shell"
+import { ParentChildLinkCard } from "@/components/parent/parent-child-link-card"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { formatActivityLabel } from "@/lib/activity"
+import { getAssignmentProgressMeta, getAssignmentProgressState } from "@/lib/assignments"
+import { getParentOverview } from "@/lib/data"
+import { requireRole } from "@/lib/permissions"
+import { formatDate } from "@/lib/utils"
 
 export default async function ChildProgressPage() {
-  const session = await requireRole("parent");
-  const data = await getParentOverview(session.user.id);
+  const session = await requireRole("parent")
+  const data = await getParentOverview(session.user.id)
 
   if (!data) {
     return (
@@ -18,22 +18,20 @@ export default async function ChildProgressPage() {
         <div className="space-y-4">
           <div>
             <h1 className="text-4xl font-black text-pop-ink">Сначала привяжите ребенка</h1>
-            <p className="mt-2 text-muted-foreground">
-              Как только связь будет создана, здесь появится детальный прогресс ученика.
-            </p>
+            <p className="mt-2 text-muted-foreground">После этого здесь появится подробный прогресс.</p>
           </div>
           <ParentChildLinkCard />
         </div>
       </AppShell>
-    );
+    )
   }
 
   return (
     <AppShell role="parent">
       <div className="space-y-6">
         <div>
-          <h1 className="text-4xl font-black text-pop-ink">Детальный прогресс ребенка</h1>
-          <p className="mt-2 text-muted-foreground">Здесь собраны завершенные темы, teacher-задания и лента активности.</p>
+          <h1 className="text-4xl font-black text-pop-ink">Подробный прогресс</h1>
+          <p className="mt-2 text-muted-foreground">Темы, задания и активность ребенка.</p>
         </div>
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>
@@ -71,10 +69,8 @@ export default async function ChildProgressPage() {
         <Card>
           <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
             <div>
-              <CardTitle>Прогресс по назначенным заданиям</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Выполненные задания, незавершенные попытки и новые назначения по группам ребенка.
-              </p>
+              <CardTitle>Прогресс по заданиям</CardTitle>
+              <p className="text-sm text-muted-foreground">Статусы и попытки по всем назначениям.</p>
             </div>
             {data.assignmentSummary.total ? (
               <div className="flex flex-wrap gap-2">
@@ -90,9 +86,9 @@ export default async function ChildProgressPage() {
                 const progressMeta = getAssignmentProgressMeta(
                   getAssignmentProgressState({
                     hasCompletedAttempt: assignment.hasCompletedAttempt,
-                    attemptCount: assignment.attemptCount
-                  })
-                );
+                    attemptCount: assignment.attemptCount,
+                  }),
+                )
 
                 return (
                   <div key={assignment.id} className="rounded-[24px] bg-white/80 p-4">
@@ -111,16 +107,14 @@ export default async function ChildProgressPage() {
                       <span>Дедлайн: {assignment.dueAt ? formatDate(assignment.dueAt) : "Без даты"}</span>
                     </div>
                   </div>
-                );
+                )
               })
             ) : (
-              <p className="text-sm text-muted-foreground">
-                У ребенка пока нет опубликованных заданий от учителя.
-              </p>
+              <p className="text-sm text-muted-foreground">Назначенных заданий пока нет.</p>
             )}
           </CardContent>
         </Card>
       </div>
     </AppShell>
-  );
+  )
 }

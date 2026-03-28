@@ -1,70 +1,70 @@
-"use client";
+"use client"
 
-import { zodResolver } from "@hookform/resolvers/zod";
-import { Loader2, UserPlus } from "lucide-react";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useState } from "react";
-import { useForm, useWatch } from "react-hook-form";
-import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod"
+import { Loader2, UserPlus } from "lucide-react"
+import Link from "next/link"
+import { useRouter } from "next/navigation"
+import { useState } from "react"
+import { useForm, useWatch } from "react-hook-form"
+import { z } from "zod"
 
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 
 const schema = z.object({
   name: z.string().min(2),
   email: z.string().email(),
   password: z.string().min(8),
-  role: z.enum(["student", "parent", "teacher"])
-});
+  role: z.enum(["student", "parent", "teacher"]),
+})
 
-type FormValues = z.infer<typeof schema>;
+type FormValues = z.infer<typeof schema>
 
 export function RegisterForm() {
-  const router = useRouter();
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter()
+  const [error, setError] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       name: "",
       email: "",
       password: "",
-      role: "student"
-    }
-  });
-  const selectedRole = useWatch({ control: form.control, name: "role" });
+      role: "student",
+    },
+  })
+  const selectedRole = useWatch({ control: form.control, name: "role" })
 
   async function onSubmit(values: FormValues) {
-    setError("");
-    setIsLoading(true);
+    setError("")
+    setIsLoading(true)
 
     const response = await fetch("/api/auth/register", {
       method: "POST",
       headers: {
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
       },
-      body: JSON.stringify(values)
-    });
+      body: JSON.stringify(values),
+    })
 
-    const data = await response.json();
-    setIsLoading(false);
+    const data = await response.json()
+    setIsLoading(false)
 
     if (!response.ok) {
-      setError(data.message || "Ошибка регистрации.");
-      return;
+      setError(data.message || "Ошибка регистрации.")
+      return
     }
 
-    router.push("/login");
+    router.push("/login")
   }
 
   return (
     <Card className="w-full max-w-md">
       <CardHeader>
         <CardTitle>Создать аккаунт</CardTitle>
-        <CardDescription>Выбери роль и создай доступ к демо-платформе.</CardDescription>
+        <CardDescription>Выбери роль и начни работу.</CardDescription>
       </CardHeader>
       <CardContent>
         <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
@@ -86,16 +86,14 @@ export function RegisterForm() {
               {[
                 ["student", "Ученик"],
                 ["parent", "Родитель"],
-                ["teacher", "Учитель"]
+                ["teacher", "Учитель"],
               ].map(([value, label]) => (
                 <button
                   key={value}
                   type="button"
                   onClick={() => form.setValue("role", value as "student" | "parent" | "teacher")}
                   className={`rounded-2xl border px-4 py-3 text-sm font-semibold ${
-                    selectedRole === value
-                      ? "border-pop-coral bg-orange-50 text-pop-coral"
-                      : "bg-white/80 text-muted-foreground"
+                    selectedRole === value ? "border-pop-coral bg-orange-50 text-pop-coral" : "bg-white/80 text-muted-foreground"
                   }`}
                 >
                   {label}
@@ -117,5 +115,5 @@ export function RegisterForm() {
         </p>
       </CardContent>
     </Card>
-  );
+  )
 }

@@ -3,6 +3,7 @@ import type { NextAuthOptions } from "next-auth";
 import { getServerSession } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+import { logStudentActivity } from "@/lib/activity";
 import { prisma } from "@/lib/prisma";
 import { type AppRole } from "@/lib/roles";
 
@@ -44,12 +45,10 @@ export const authOptions: NextAuthOptions = {
         });
 
         if (student) {
-          await prisma.activityLog.create({
-            data: {
-              studentId: student.id,
-              type: "login",
-              payload: { email: user.email }
-            }
+          await logStudentActivity(prisma, {
+            studentId: student.id,
+            type: "login",
+            payload: { email: user.email }
           });
         }
 

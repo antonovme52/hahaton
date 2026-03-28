@@ -183,19 +183,21 @@ export async function getProfileData(userId: string) {
     }
   });
 
-  const achievements = await prisma.userAchievement.findMany({
-    where: { userId },
-    include: { achievement: true },
-    orderBy: { unlockedAt: "desc" }
-  });
+  const [achievements, allAchievements] = await Promise.all([
+    prisma.userAchievement.findMany({
+      where: { userId },
+      include: { achievement: true },
+      orderBy: { unlockedAt: "desc" }
+    }),
+    prisma.achievement.findMany({
+      orderBy: { createdAt: "asc" }
+    })
+  ]);
 
-  const activity = await prisma.activityLog.findMany({
-    where: { studentId: student.id },
-    orderBy: { createdAt: "desc" },
-    take: 10
-  });
+  const unlockedAchievementIds = new Set(achievements.map((item) => item.achievementId));
+  const lockedAchievements = allAchievements.filter((achievement) => !unlockedAchievementIds.has(achievement.id));
 
-  return { student, achievements, activity };
+  return { student, achievements, lockedAchievements };
 }
 
 export async function getParentOverview(userId: string) {

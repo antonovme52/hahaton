@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { logStudentActivity } from "@/lib/activity";
 import { auth } from "@/lib/auth";
 import { getProgrammingGameData } from "@/lib/portal-data";
 import { evaluateProgrammingLevel, getProgrammingGameLevel } from "@/lib/programming-game";
@@ -110,17 +111,15 @@ export async function POST(request: Request) {
       levelValue = result.level;
     }
 
-    await tx.activityLog.create({
-      data: {
-        studentId: student.id,
-        type: "programming_level_completed",
-        payload: {
-          levelKey: level.key,
-          levelTitle: level.title,
-          isCorrect: evaluation.isCorrect,
-          score: evaluation.score,
-          xpAwarded
-        }
+    await logStudentActivity(tx, {
+      studentId: student.id,
+      type: "programming_level_completed",
+      payload: {
+        levelKey: level.key,
+        levelTitle: level.title,
+        isCorrect: evaluation.isCorrect,
+        score: evaluation.score,
+        xpAwarded
       }
     });
   });

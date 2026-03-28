@@ -1,35 +1,35 @@
-import Link from "next/link";
+import Link from "next/link"
 
-import { AppShell } from "@/components/layout/app-shell";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import { AppShell } from "@/components/layout/app-shell"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
 import {
   assignmentCategoryLabels,
   assignmentDifficultyLabels,
+  assignmentTypeLabels,
   getAssignmentProgressMeta,
   getAssignmentProgressState,
-  assignmentTypeLabels
-} from "@/lib/assignments";
-import { requireRole } from "@/lib/permissions";
-import { getStudentAssignmentsData } from "@/lib/portal-data";
-import { formatDate } from "@/lib/utils";
+} from "@/lib/assignments"
+import { requireRole } from "@/lib/permissions"
+import { getStudentAssignmentsData } from "@/lib/portal-data"
+import { formatDate } from "@/lib/utils"
 
 export default async function AssignmentsPage() {
-  const session = await requireRole("student");
-  const data = await getStudentAssignmentsData(session.user.id);
+  const session = await requireRole("student")
+  const data = await getStudentAssignmentsData(session.user.id)
   const assignmentGroups = [
     {
       key: "programming",
       title: assignmentCategoryLabels.programming,
-      items: data.assignments.filter((assignment) => assignment.category === "programming")
+      items: data.assignments.filter((assignment) => assignment.category === "programming"),
     },
     {
       key: "general",
       title: assignmentCategoryLabels.general,
-      items: data.assignments.filter((assignment) => assignment.category === "general")
-    }
-  ] as const;
+      items: data.assignments.filter((assignment) => assignment.category === "general"),
+    },
+  ] as const
 
   return (
     <AppShell role="student">
@@ -37,9 +37,7 @@ export default async function AssignmentsPage() {
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-pop-coral">Задания</p>
           <h1 className="text-4xl font-black text-pop-ink">Назначенные задания</h1>
-          <p className="mt-2 max-w-3xl text-muted-foreground">
-            Здесь собраны teacher-задания по твоим группам: теория, programming-практика и coding-челленджи.
-          </p>
+          <p className="mt-2 max-w-3xl text-muted-foreground">Все задания по твоим группам.</p>
         </div>
 
         {assignmentGroups.map((group) =>
@@ -54,9 +52,9 @@ export default async function AssignmentsPage() {
                   const progressMeta = getAssignmentProgressMeta(
                     getAssignmentProgressState({
                       hasCompletedAttempt: assignment.hasCompletedAttempt,
-                      attemptCount: assignment.attemptCount
-                    })
-                  );
+                      attemptCount: assignment.attemptCount,
+                    }),
+                  )
 
                   return (
                     <Card key={assignment.id}>
@@ -91,21 +89,19 @@ export default async function AssignmentsPage() {
                         </Button>
                       </CardContent>
                     </Card>
-                  );
+                  )
                 })}
               </div>
             </section>
-          ) : null
+          ) : null,
         )}
 
         {!data.assignments.length ? (
           <Card>
-            <CardContent className="p-6 text-muted-foreground">
-              У тебя пока нет назначенных заданий. Как только учитель опубликует задания для твоей группы, они появятся здесь.
-            </CardContent>
+            <CardContent className="p-6 text-muted-foreground">Назначенных заданий пока нет.</CardContent>
           </Card>
         ) : null}
       </div>
     </AppShell>
-  );
+  )
 }

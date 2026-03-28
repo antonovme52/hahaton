@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { Fragment, useEffect, useMemo, useState } from "react";
 import {
@@ -750,7 +750,7 @@ function PaletteBlockCard({
               ) : null}
               {(block.sections?.length || 0) > 0 ? (
                 <div className="mt-4 rounded-[18px] border border-black/10 bg-white/16 px-3 py-2 text-xs font-semibold">
-                  Внутри можно собирать {(block.sections?.length || 0) > 1 ? "несколько вложенных веток" : "вложенный стек"}
+                  Здесь можно собрать {(block.sections?.length || 0) > 1 ? "несколько вложенных веток" : "вложенный стек"}
                 </div>
               ) : null}
             </div>
@@ -783,7 +783,7 @@ export function BlockProgrammingStudio({
   const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
   const [commentEditorId, setCommentEditorId] = useState<string | null>(null);
   const [collapsedCategories, setCollapsedCategories] = useState<Record<string, boolean>>(() =>
-    Object.fromEntries(Object.keys(blockCategoryMeta).map((category) => [category, false]))
+    Object.fromEntries(Object.keys(blockCategoryMeta).map((category) => [category, true]))
   );
 
   const filteredBlocks = useMemo(() => filterBlocksByName(blockCatalog, query), [query]);
@@ -909,16 +909,16 @@ export function BlockProgrammingStudio({
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="space-y-2">
               <div className="flex flex-wrap gap-3">
-                <Badge variant="reward">Blocks Studio</Badge>
-                <Badge variant="outline">{Object.keys(blockCategoryMeta).length} categories</Badge>
-                <Badge variant="info">{blockCatalog.length} blocks</Badge>
-                <Badge variant="outline">{sprites.length} sprites</Badge>
+                <Badge variant="reward">Блоки</Badge>
+                <Badge variant="outline">{Object.keys(blockCategoryMeta).length} категорий</Badge>
+                <Badge variant="info">{blockCatalog.length} блоков</Badge>
+                <Badge variant="outline">{sprites.length} сущностей</Badge>
               </div>
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.32em] text-[#6f9ac5]">Step 1</p>
-                <h2 className="mt-2 text-3xl font-black text-[#244a73]">Рабочая область блоков</h2>
+                <h2 className="mt-2 text-3xl font-black text-[#244a73]">Рабочая область</h2>
                 <p className="mt-1 max-w-3xl text-[#5e7a98]">
-                  Перетаскивай блоки из палитры, собирай вертикальный стек, вкладывай команды в `если` и `повторить`, редактируй параметры прямо внутри блока.
+                  Перетаскивай блоки из палитры, собирай сценарий и меняй параметры прямо в блоках.
                 </p>
               </div>
             </div>
@@ -955,7 +955,7 @@ export function BlockProgrammingStudio({
                   : "border-[#dbe8ff] bg-[#f8fbff] text-[#5e7a98]"
               )}
             >
-              Верни блок обратно в палитру, чтобы удалить его из рабочего скрипта.
+              Перетащи блок сюда, чтобы убрать его из сценария.
             </div>
 
             {groupedBlocks.map(({ category, meta, blocks }) => (
@@ -967,7 +967,7 @@ export function BlockProgrammingStudio({
                   className="mb-4 flex w-full items-center justify-between gap-3 rounded-[20px] text-left transition hover:opacity-95"
                 >
                   <div>
-                    <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Category</p>
+                    <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Категория</p>
                     <h3 className="text-xl font-black text-[#26527c]">{meta.label}</h3>
                   </div>
                   <div className="flex items-center gap-2">
@@ -998,7 +998,7 @@ export function BlockProgrammingStudio({
                     </div>
                   ) : (
                     <div className="rounded-[20px] border border-dashed border-white/70 bg-white/70 px-4 py-5 text-sm text-[#5e7a98]">
-                      По запросу ничего не найдено в категории {meta.label.toLocaleLowerCase("ru-RU")}.
+                      В категории {meta.label.toLocaleLowerCase("ru-RU")} ничего не найдено.
                     </div>
                   )
                 ) : null}
@@ -1010,14 +1010,14 @@ export function BlockProgrammingStudio({
             <div className="overflow-hidden rounded-[30px] border border-[#d8ebff] bg-[#f9fcff]">
               <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#d8ebff] bg-white px-5 py-4">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.35em] text-[#6f9ac5]">Workspace</p>
+                  <p className="text-xs font-black uppercase tracking-[0.35em] text-[#6f9ac5]">Рабочая область</p>
                   <h3 className="text-2xl font-black text-[#26527c]">
-                    {activeSprite ? `Скрипты спрайта: ${activeSprite.name}` : "Скрипты"}
+                    {activeSprite ? `Скрипты: ${activeSprite.name}` : "Скрипты"}
                   </h3>
                 </div>
                 <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="outline">{workspaceBlocks.length} top-level</Badge>
-                  <Badge variant="info">{totalBlockCount} blocks total</Badge>
+                  <Badge variant="outline">{workspaceBlocks.length} верхних блоков</Badge>
+                  <Badge variant="info">{totalBlockCount} блоков всего</Badge>
                   <div className="flex items-center gap-1 rounded-full border border-[#d8ebff] bg-white p-1">
                     <Button
                       type="button"
@@ -1067,7 +1067,7 @@ export function BlockProgrammingStudio({
                 </div>
 
                 <div className="rounded-[24px] border border-dashed border-[#cddfff] bg-white px-4 py-4 text-sm text-[#5e7a98]">
-                  У каждого спрайта своя рабочая область. Блок можно вытащить из середины стека, удалить через корзину или вернуть в палитру.
+                  У каждой сущности своя рабочая область. Блок можно перетащить, удалить или вернуть в палитру.
                 </div>
 
                 <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_180px]">
@@ -1098,7 +1098,7 @@ export function BlockProgrammingStudio({
                     sectionId={null}
                             activeDropZone={activeDropZone}
                             commentEditorId={commentEditorId}
-                            emptyLabel="Брось блок сюда, чтобы начать новый скрипт"
+                            emptyLabel="Перетащи блок сюда, чтобы начать сценарий"
                             onActivateDropZone={setActiveDropZone}
                             onDropTarget={handleDropTarget}
                             onDragStart={(event, instanceId) => {
@@ -1124,7 +1124,7 @@ export function BlockProgrammingStudio({
                       </div>
                     ) : (
                       <div className="flex min-h-[320px] items-center justify-center rounded-[26px] border-2 border-dashed border-[#d0e3ff] bg-[#f6faff] px-6 py-10 text-center text-[#5e7a98]">
-                        Выбери спрайт, чтобы открыть его рабочую область.
+                        Выбери сущность, чтобы открыть её рабочую область.
                       </div>
                     )}
                   </div>
@@ -1147,28 +1147,10 @@ export function BlockProgrammingStudio({
                       <div className="rounded-full bg-white p-4 shadow-sm">
                         <Trash2 className="h-7 w-7" />
                       </div>
-                      <h4 className="mt-4 text-lg font-black">Корзина</h4>
-                      <p className="mt-2 text-sm">Перетащи сюда блок, чтобы удалить его из рабочего сценария.</p>
+                      <h4 className="mt-4 text-lg font-black">Удаление</h4>
+                      <p className="mt-2 text-sm">Перетащи сюда блок, чтобы удалить его из сценария.</p>
                     </div>
 
-                    <div className="rounded-[24px] border border-[#d9ebff] bg-white p-4">
-                      <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Контекст</p>
-                      <p className="mt-2 text-sm text-[#5e7a98]">
-                        Правый клик по блоку или кнопка `…` открывают меню с дублированием, удалением и комментариями.
-                      </p>
-                    </div>
-                    <div className="rounded-[24px] border border-[#d9ebff] bg-white p-4">
-                      <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Вложенность</p>
-                      <p className="mt-2 text-sm text-[#5e7a98]">
-                        У блоков `если` и `повторить` есть собственные слоты, куда можно собирать отдельные внутренние стеки.
-                      </p>
-                    </div>
-                    <div className="rounded-[24px] border border-[#d9ebff] bg-white p-4">
-                      <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Масштаб</p>
-                      <p className="mt-2 text-sm text-[#5e7a98]">
-                        Рабочая область прокручивается, а масштаб меняется кнопками или `Ctrl + колесо мыши`.
-                      </p>
-                    </div>
                   </div>
                 </div>
               </div>
@@ -1179,7 +1161,7 @@ export function BlockProgrammingStudio({
         {disabled ? (
           <div className="absolute inset-0 z-30 rounded-[32px] border border-dashed border-[#ffd4ad] bg-white/62 backdrop-blur-[1px]">
             <div className="absolute right-5 top-5 rounded-full bg-[#fff3e7] px-4 py-2 text-sm font-semibold text-[#9a5a24] shadow-sm">
-              Редактирование заблокировано во время выполнения
+              Редактирование недоступно во время запуска
             </div>
           </div>
         ) : null}
@@ -1195,3 +1177,4 @@ export function BlockProgrammingStudio({
     </>
   );
 }
+

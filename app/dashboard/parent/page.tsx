@@ -1,17 +1,17 @@
-import { AppShell } from "@/components/layout/app-shell";
-import { ChildOverviewCard } from "@/components/parent/child-overview-card";
-import { ParentChildLinkCard } from "@/components/parent/parent-child-link-card";
-import { AchievementGrid } from "@/components/gamification/achievement-grid";
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { getAssignmentProgressMeta, getAssignmentProgressState } from "@/lib/assignments";
-import { getParentOverview } from "@/lib/data";
-import { requireRole } from "@/lib/permissions";
-import { formatDate } from "@/lib/utils";
+import { AchievementGrid } from "@/components/gamification/achievement-grid"
+import { AppShell } from "@/components/layout/app-shell"
+import { ChildOverviewCard } from "@/components/parent/child-overview-card"
+import { ParentChildLinkCard } from "@/components/parent/parent-child-link-card"
+import { Badge } from "@/components/ui/badge"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { getAssignmentProgressMeta, getAssignmentProgressState } from "@/lib/assignments"
+import { getParentOverview } from "@/lib/data"
+import { requireRole } from "@/lib/permissions"
+import { formatDate } from "@/lib/utils"
 
 export default async function ParentDashboardPage() {
-  const session = await requireRole("parent");
-  const data = await getParentOverview(session.user.id);
+  const session = await requireRole("parent")
+  const data = await getParentOverview(session.user.id)
 
   if (!data) {
     return (
@@ -19,15 +19,13 @@ export default async function ParentDashboardPage() {
         <div className="space-y-4">
           <div>
             <p className="text-sm font-semibold uppercase tracking-wide text-pop-coral">Родительский кабинет</p>
-            <h1 className="text-4xl font-black text-pop-ink">Подключите ребенка к аккаунту</h1>
-            <p className="mt-2 text-muted-foreground">
-              После привязки здесь появятся темы, тесты, достижения и лента активности ученика.
-            </p>
+            <h1 className="text-4xl font-black text-pop-ink">Подключите ребенка</h1>
+            <p className="mt-2 text-muted-foreground">После привязки здесь появится прогресс.</p>
           </div>
           <ParentChildLinkCard />
         </div>
       </AppShell>
-    );
+    )
   }
 
   return (
@@ -36,7 +34,7 @@ export default async function ParentDashboardPage() {
         <div>
           <p className="text-sm font-semibold uppercase tracking-wide text-pop-coral">Родительский кабинет</p>
           <h1 className="text-4xl font-black text-pop-ink">Прогресс {data.child.user.name}</h1>
-          <p className="mt-2 text-muted-foreground">Следите за темами, домашними заданиями, тестами и активностью ребенка.</p>
+          <p className="mt-2 text-muted-foreground">Темы, тесты и активность в одном месте.</p>
         </div>
 
         <ChildOverviewCard
@@ -59,7 +57,7 @@ export default async function ParentDashboardPage() {
                     <span className="text-sm font-semibold">{Math.round(item.progress.progress)}%</span>
                   </div>
                   <p className="mt-2 text-sm text-muted-foreground">
-                    Завершено {item.progress.completedTopics} из {item.progress.totalTopics} тем
+                    Завершено {item.progress.completedTopics} из {item.progress.totalTopics}
                   </p>
                 </div>
               ))}
@@ -81,7 +79,7 @@ export default async function ParentDashboardPage() {
                   </div>
                 ))
               ) : (
-                <p className="text-sm text-muted-foreground">Контрольные тесты пока не проходились.</p>
+                <p className="text-sm text-muted-foreground">Тестов пока нет.</p>
               )}
             </CardContent>
           </Card>
@@ -91,7 +89,7 @@ export default async function ParentDashboardPage() {
           <div className="flex flex-wrap items-center justify-between gap-3">
             <div>
               <h2 className="text-2xl font-bold">Назначенные задания</h2>
-              <p className="text-muted-foreground">Видно, что уже выполнено, где были попытки и что еще не начато.</p>
+              <p className="text-muted-foreground">Статус, попытки и дедлайны.</p>
             </div>
             {data.assignmentSummary.total ? (
               <div className="flex flex-wrap gap-2">
@@ -109,9 +107,9 @@ export default async function ParentDashboardPage() {
                   const progressMeta = getAssignmentProgressMeta(
                     getAssignmentProgressState({
                       hasCompletedAttempt: assignment.hasCompletedAttempt,
-                      attemptCount: assignment.attemptCount
-                    })
-                  );
+                      attemptCount: assignment.attemptCount,
+                    }),
+                  )
 
                   return (
                     <div key={assignment.id} className="rounded-[24px] bg-white/80 p-4">
@@ -130,12 +128,10 @@ export default async function ParentDashboardPage() {
                         <span>Дедлайн: {assignment.dueAt ? formatDate(assignment.dueAt) : "Без даты"}</span>
                       </div>
                     </div>
-                  );
+                  )
                 })
               ) : (
-                <p className="text-sm text-muted-foreground">
-                  У ребенка пока нет опубликованных teacher-заданий по его группам.
-                </p>
+                <p className="text-sm text-muted-foreground">Опубликованных заданий пока нет.</p>
               )}
             </CardContent>
           </Card>
@@ -147,5 +143,5 @@ export default async function ParentDashboardPage() {
         </section>
       </div>
     </AppShell>
-  );
+  )
 }

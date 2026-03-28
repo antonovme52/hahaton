@@ -1,55 +1,68 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
-import { CheckCircle2, Medal, RotateCcw } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion"
+import { CheckCircle2, Medal, RotateCcw } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { useRef, useState } from "react"
 
-import { XpCounter } from "@/components/gamification/xp-counter";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { SuccessBurst } from "@/components/gamification/success-burst"
+import { XpCounter } from "@/components/gamification/xp-counter"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { cn } from "@/lib/utils"
 
 type QuizQuestion = {
-  id: string;
-  question: string;
-  options: string[];
-};
+  id: string
+  question: string
+  options: string[]
+}
 
 export function QuizRunner({
   moduleSlug,
   title,
-  questions
+  questions,
 }: {
-  moduleSlug: string;
-  title: string;
-  questions: QuizQuestion[];
+  moduleSlug: string
+  title: string
+  questions: QuizQuestion[]
 }) {
-  const [answers, setAnswers] = useState<number[]>(Array(questions.length).fill(-1));
+  const [answers, setAnswers] = useState<number[]>(Array(questions.length).fill(-1))
   const [result, setResult] = useState<null | {
-    score: number;
-    passed: boolean;
-    xpReward: number;
-    level: number;
-    rewards: string[];
-  }>(null);
-  const [loading, setLoading] = useState(false);
-  const router = useRouter();
+    score: number
+    passed: boolean
+    xpReward: number
+    level: number
+    rewards: string[]
+  }>(null)
+  const [loading, setLoading] = useState(false)
+  const [showBurst, setShowBurst] = useState(false)
+  const burstTimeoutRef = useRef<number | null>(null)
+  const router = useRouter()
 
   async function submit() {
-    setLoading(true);
+    setLoading(true)
     const response = await fetch(`/api/quiz/${moduleSlug}`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ answers })
-    });
-    const data = await response.json();
-    setLoading(false);
+      body: JSON.stringify({ answers }),
+    })
+    const data = await response.json()
+    setLoading(false)
 
     if (response.ok) {
-      setResult(data);
-      router.refresh();
+      setResult(data)
+      if (data.passed) {
+        if (burstTimeoutRef.current) {
+          window.clearTimeout(burstTimeoutRef.current)
+        }
+        setShowBurst(true)
+        burstTimeoutRef.current = window.setTimeout(() => {
+          setShowBurst(false)
+          burstTimeoutRef.current = null
+        }, 1400)
+      }
+      router.refresh()
     }
   }
 
@@ -62,31 +75,31 @@ export function QuizRunner({
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -12 }}
           transition={{ duration: 0.3 }}
+          className="relative"
         >
+          <SuccessBurst active={showBurst} />
           <Card
             className={cn(
               "bg-gradient-to-br",
               result.passed
                 ? "animate-success-pulse border-green-200 from-white to-green-50"
-                : "animate-error-shake border-red-200 from-white to-red-50"
+                : "animate-error-shake border-red-200 from-white to-red-50",
             )}
           >
             <CardContent className="space-y-4 p-6">
               <div
                 className={cn(
                   "flex h-14 w-14 items-center justify-center rounded-3xl text-white",
-                  result.passed ? "bg-green-500" : "bg-red-500"
+                  result.passed ? "bg-green-500" : "bg-red-500",
                 )}
               >
                 {result.passed ? <CheckCircle2 className="h-7 w-7" /> : <RotateCcw className="h-7 w-7" />}
               </div>
               <div>
-                <h2 className="text-2xl font-bold">
-                  {result.passed ? "Тест пройден успешно" : "Попробуй еще раз"}
-                </h2>
+                <h2 className="text-2xl font-bold">{result.passed ? "Тест пройден" : "Попробуй еще раз"}</h2>
                 <p className="text-muted-foreground">
-                  Результат: <XpCounter value={result.score} suffix="%" /> • Награда:{" "}
-                  <XpCounter value={result.xpReward} suffix=" XP" /> • Уровень: {result.level}
+                  Результат: <XpCounter value={result.score} suffix="%" /> • Награда: <XpCounter value={result.xpReward} suffix=" XP" /> • Уровень:{" "}
+                  {result.level}
                 </p>
               </div>
               {result.rewards.length ? (
@@ -95,12 +108,23 @@ export function QuizRunner({
                   {result.rewards.join(", ")}
                 </Badge>
               ) : null}
-              <Button onClick={() => setResult(null)}>Пройти снова</Button>
+              <Button
+                onClick={() => {
+                  if (burstTimeoutRef.current) {
+                    window.clearTimeout(burstTimeoutRef.current)
+                    burstTimeoutRef.current = null
+                  }
+                  setShowBurst(false)
+                  setResult(null)
+                }}
+              >
+                Пройти снова
+              </Button>
             </CardContent>
           </Card>
         </motion.div>
       </AnimatePresence>
-    );
+    )
   }
 
   return (
@@ -124,15 +148,13 @@ export function QuizRunner({
                   type="button"
                   onClick={() =>
                     setAnswers((prev) => {
-                      const next = [...prev];
-                      next[index] = optionIndex;
-                      return next;
+                      const next = [...prev]
+                      next[index] = optionIndex
+                      return next
                     })
                   }
                   className={`rounded-3xl border px-4 py-4 text-left font-medium ${
-                    answers[index] === optionIndex
-                      ? "animate-scale-in border-pop-coral bg-orange-50"
-                      : "animate-scale-in bg-white/80"
+                    answers[index] === optionIndex ? "animate-scale-in border-pop-coral bg-orange-50" : "animate-scale-in bg-white/80"
                   }`}
                 >
                   {option}
@@ -146,5 +168,5 @@ export function QuizRunner({
         Завершить тест
       </Button>
     </div>
-  );
+  )
 }

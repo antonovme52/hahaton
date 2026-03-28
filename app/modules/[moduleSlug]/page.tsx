@@ -1,31 +1,31 @@
-import { CheckCircle2, Lock, NotebookText } from "lucide-react";
-import Link from "next/link";
-import { notFound } from "next/navigation";
+import { CheckCircle2, Lock, NotebookText } from "lucide-react"
+import Link from "next/link"
+import { notFound } from "next/navigation"
 
-import { AppShell } from "@/components/layout/app-shell";
-import { ProgressPill } from "@/components/gamification/progress-pill";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { getModuleDetails } from "@/lib/data";
-import { requireRole } from "@/lib/permissions";
+import { ProgressPill } from "@/components/gamification/progress-pill"
+import { AppShell } from "@/components/layout/app-shell"
+import { Badge } from "@/components/ui/badge"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent } from "@/components/ui/card"
+import { getModuleDetails } from "@/lib/data"
+import { requireRole } from "@/lib/permissions"
 
 export default async function ModuleDetailPage({
-  params
+  params,
 }: {
-  params: Promise<{ moduleSlug: string }>;
+  params: Promise<{ moduleSlug: string }>
 }) {
-  const { moduleSlug } = await params;
-  const session = await requireRole("student");
-  let moduleData: Awaited<ReturnType<typeof getModuleDetails>>;
+  const { moduleSlug } = await params
+  const session = await requireRole("student")
+  let moduleData: Awaited<ReturnType<typeof getModuleDetails>>
 
   try {
-    moduleData = await getModuleDetails(session.user.id, moduleSlug);
+    moduleData = await getModuleDetails(session.user.id, moduleSlug)
   } catch {
-    notFound();
+    notFound()
   }
 
-  const { module, progress } = moduleData;
+  const { module, progress } = moduleData
 
   return (
     <AppShell role="student">
@@ -42,7 +42,7 @@ export default async function ModuleDetailPage({
               <div>
                 <h2 className="text-xl font-semibold">Прогресс по модулю</h2>
                 <p className="text-sm text-muted-foreground">
-                  Завершено {progress.completedTopics} из {progress.totalTopics} тем
+                  Завершено {progress.completedTopics} из {progress.totalTopics}
                 </p>
               </div>
               {progress.isCompleted ? <Badge variant="reward">Тест открыт</Badge> : null}
@@ -53,19 +53,16 @@ export default async function ModuleDetailPage({
 
         <div className="grid gap-4">
           {module.topics.map((topic, index) => {
-            const completed = topic.progress.some((entry) => entry.completed);
-            const previousCompleted =
-              index === 0 || module.topics[index - 1].progress.some((entry) => entry.completed);
-            const canOpen = completed || previousCompleted;
+            const completed = topic.progress.some((entry) => entry.completed)
+            const previousCompleted = index === 0 || module.topics[index - 1].progress.some((entry) => entry.completed)
+            const canOpen = completed || previousCompleted
 
             return (
               <Card key={topic.id}>
                 <CardContent className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <Badge variant={completed ? "reward" : "outline"}>
-                        Тема {topic.order}
-                      </Badge>
+                      <Badge variant={completed ? "reward" : "outline"}>Тема {topic.order}</Badge>
                       {completed ? <CheckCircle2 className="h-4 w-4 text-green-600" /> : null}
                     </div>
                     <h3 className="text-xl font-semibold">{topic.title}</h3>
@@ -86,15 +83,15 @@ export default async function ModuleDetailPage({
                   )}
                 </CardContent>
               </Card>
-            );
+            )
           })}
         </div>
 
         <Card>
           <CardContent className="flex flex-col gap-4 p-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="text-xl font-semibold">Контрольное тестирование</h2>
-              <p className="text-sm text-muted-foreground">После завершения всех тем можно сдать тест и получить награду.</p>
+              <h2 className="text-xl font-semibold">Контрольный тест</h2>
+              <p className="text-sm text-muted-foreground">Открывается после всех тем.</p>
             </div>
             {progress.isCompleted ? (
               <Button asChild>
@@ -109,5 +106,5 @@ export default async function ModuleDetailPage({
         </Card>
       </div>
     </AppShell>
-  );
+  )
 }

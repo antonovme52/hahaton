@@ -7,7 +7,7 @@ export function StatCard({
   value,
   helper,
   icon: Icon,
-  tone = "from-pop-coral to-pop-sun"
+  tone = "from-pop-sky to-pop-plum"
 }: {
   label: string;
   value: string;

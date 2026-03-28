@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { logStudentActivity } from "@/lib/activity";
 import { evaluateAssignmentAnswer, parseStoredAssignment } from "@/lib/assignments";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -86,17 +87,15 @@ export async function POST(
       level = result.level;
     }
 
-    await tx.activityLog.create({
-      data: {
-        studentId: student.id,
-        type: "assignment_completed",
-        payload: {
-          assignmentId: assignment.id,
-          assignmentTitle: assignment.title,
-          isCorrect: evaluation.isCorrect,
-          score: evaluation.score,
-          xpAwarded
-        }
+    await logStudentActivity(tx, {
+      studentId: student.id,
+      type: "assignment_completed",
+      payload: {
+        assignmentId: assignment.id,
+        assignmentTitle: assignment.title,
+        isCorrect: evaluation.isCorrect,
+        score: evaluation.score,
+        xpAwarded
       }
     });
   });

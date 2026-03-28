@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { logStudentActivity } from "@/lib/activity";
 import { awardAchievementIfNeeded } from "@/lib/achievements";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -87,16 +88,14 @@ export async function POST(
       }
     });
 
-    await tx.activityLog.create({
-      data: {
-        studentId: student.id,
-        type: "quiz_completed",
-        payload: {
-          moduleSlug: learningModule.slug,
-          moduleTitle: learningModule.title,
-          score,
-          passed
-        }
+    await logStudentActivity(tx, {
+      studentId: student.id,
+      type: "quiz_completed",
+      payload: {
+        moduleSlug: learningModule.slug,
+        moduleTitle: learningModule.title,
+        score,
+        passed
       }
     });
   });

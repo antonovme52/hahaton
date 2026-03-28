@@ -612,7 +612,7 @@ export function ScratchStudio() {
       <div className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Sprites</p>
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Сущности</p>
             <h3 className="text-xl font-black text-[#26527c]">Список спрайтов</h3>
           </div>
           <Button
@@ -624,7 +624,7 @@ export function ScratchStudio() {
             disabled={interactiveLocked}
           >
             <Plus className="mr-2 h-4 w-4" />
-            Add
+            Добавить
           </Button>
         </div>
 
@@ -678,7 +678,7 @@ export function ScratchStudio() {
                           <p className="font-black text-[#26527c]">{sprite.name}</p>
                         )}
                         <p className="mt-1 text-sm text-[#5e7a98]">
-                          {sprite.visible ? "Visible" : "Hidden"} • {sprite.costumes.length} costumes
+                          {sprite.visible ? "Видно" : "Скрыто"} • {sprite.costumes.length} костюмов
                         </p>
                       </div>
                     </div>
@@ -713,7 +713,7 @@ export function ScratchStudio() {
     return (
       <div className="space-y-4">
         <div>
-          <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Gallery</p>
+          <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Галерея</p>
           <h3 className="text-xl font-black text-[#26527c]">Готовые спрайты</h3>
         </div>
 
@@ -747,7 +747,7 @@ export function ScratchStudio() {
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Inspector</p>
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Инспектор</p>
             <h3 className="text-xl font-black text-[#26527c]">Активный спрайт</h3>
           </div>
           {activeSprite ? (
@@ -765,7 +765,7 @@ export function ScratchStudio() {
               disabled={interactiveLocked}
             >
               {activeSprite.visible ? <Eye className="mr-2 h-4 w-4" /> : <EyeOff className="mr-2 h-4 w-4" />}
-              {activeSprite.visible ? "Hide" : "Show"}
+              {activeSprite.visible ? "Скрыть" : "Показать"}
             </Button>
           ) : null}
         </div>
@@ -790,7 +790,7 @@ export function ScratchStudio() {
                     className="h-11 border-[#d8ebff] bg-white font-bold text-[#26527c]"
                   />
                   <p className="mt-3 text-sm text-[#5e7a98]">
-                    Current costume: <span className="font-semibold text-[#26527c]">{activeCostume.name}</span>
+                    Текущий костюм: <span className="font-semibold text-[#26527c]">{activeCostume.name}</span>
                   </p>
                 </div>
               </div>
@@ -816,7 +816,7 @@ export function ScratchStudio() {
                 onChange={(value) => updateSprite(activeSprite.id, (sprite) => ({ ...sprite, y: value }))}
               />
               <Slider
-                label="Rotation"
+                label="Поворот"
                 value={activeSprite.rotation}
                 min={-180}
                 max={180}
@@ -825,7 +825,7 @@ export function ScratchStudio() {
                 onChange={(value) => updateSprite(activeSprite.id, (sprite) => ({ ...sprite, rotation: value }))}
               />
               <Slider
-                label="Scale"
+                label="Масштаб"
                 value={activeSprite.scale * 100}
                 min={40}
                 max={240}
@@ -850,7 +850,7 @@ export function ScratchStudio() {
       <div className="space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Costumes</p>
+            <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Костюмы</p>
             <h3 className="text-xl font-black text-[#26527c]">Костюмы спрайта</h3>
           </div>
           <Button
@@ -860,7 +860,7 @@ export function ScratchStudio() {
             disabled={!activeSprite || interactiveLocked}
           >
             <ImagePlus className="mr-2 h-4 w-4" />
-            Add costume
+            Добавить костюм
           </Button>
         </div>
 
@@ -891,7 +891,7 @@ export function ScratchStudio() {
                   </div>
                   <div className="min-w-0">
                     <p className="font-black text-[#26527c]">{item.name}</p>
-                    <p className="mt-1 text-sm text-[#5e7a98]">{item.source === "upload" ? "Uploaded" : "Built-in"} costume</p>
+                    <p className="mt-1 text-sm text-[#5e7a98]">{item.source === "upload" ? "Загруженный" : "Встроенный"} костюм</p>
                   </div>
                 </button>
               );
@@ -913,9 +913,9 @@ export function ScratchStudio() {
           <CardContent className="p-4">
             <div className="grid grid-cols-3 gap-2 rounded-[24px] border border-[#d8ebff] bg-[#f7fbff] p-1">
               {[
-                { id: "blocks", label: "Blocks Studio" },
-                { id: "stage", label: "Stage Editor" },
-                { id: "workspace", label: "Workspace" }
+                { id: "blocks", label: "Студия блоков" },
+                { id: "stage", label: "Редактор сцены" },
+                { id: "workspace", label: "Рабочая область" }
               ].map((tab) => (
                 <button
                   key={tab.id}
@@ -957,9 +957,9 @@ export function ScratchStudio() {
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="space-y-2">
                   <div className="flex flex-wrap items-center gap-3">
-                    <Badge variant="reward">Stage Editor</Badge>
-                    <Badge variant="outline">{sprites.length} sprites</Badge>
-                    <Badge variant="info">{sprites.reduce((sum, sprite) => sum + sprite.costumes.length, 0)} costumes</Badge>
+                    <Badge variant="reward">Редактор сцены</Badge>
+                    <Badge variant="outline">{sprites.length} сущностей</Badge>
+                    <Badge variant="info">{sprites.reduce((sum, sprite) => sum + sprite.costumes.length, 0)} костюмов</Badge>
                   </div>
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.28em] text-[#6f9ac5]">Step 2</p>
@@ -977,7 +977,7 @@ export function ScratchStudio() {
                   disabled={interactiveLocked}
                 >
                   <Upload className="mr-2 h-4 w-4" />
-                  Import sprite
+                  Импортировать сущность
                 </Button>
               </div>
             </div>
@@ -987,8 +987,8 @@ export function ScratchStudio() {
                 <div className="overflow-hidden rounded-[30px] border border-[#d8ebff] bg-white">
                   <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#d8ebff] bg-[linear-gradient(180deg,#f9fcff_0%,#f3f9ff_100%)] px-5 py-4">
                     <div>
-                      <p className="text-xs font-black uppercase tracking-[0.35em] text-[#6f9ac5]">Stage</p>
-                      <h2 className="text-2xl font-black text-[#26527c]">Scene</h2>
+                      <p className="text-xs font-black uppercase tracking-[0.35em] text-[#6f9ac5]">Сцена</p>
+                      <h2 className="text-2xl font-black text-[#26527c]">Сцена</h2>
                     </div>
                     <div className="flex flex-wrap items-center justify-end gap-2">
                       <Badge variant={vmState.status === "running" ? "reward" : vmState.status === "paused" ? "info" : "outline"}>
@@ -996,7 +996,7 @@ export function ScratchStudio() {
                       </Badge>
                       <Button type="button" className="bg-[#1dba68] text-white hover:bg-[#179759]" onClick={handleGreenFlag}>
                         <Flag className="mr-2 h-4 w-4" />
-                        Флаг
+                        Запуск
                       </Button>
                       <Button
                         type="button"
@@ -1145,7 +1145,7 @@ export function ScratchStudio() {
                   <div className="absolute inset-x-4 bottom-4 z-30 rounded-[24px] border border-[#d8ebff] bg-white/96 p-4 shadow-[0_20px_50px_rgba(27,78,136,0.18)] backdrop-blur">
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
-                        <p className="text-xs font-black uppercase tracking-[0.24em] text-[#6f9ac5]">Question</p>
+                        <p className="text-xs font-black uppercase tracking-[0.24em] text-[#6f9ac5]">Вопрос</p>
                         <h4 className="mt-1 text-lg font-black text-[#244a73]">
                           {promptSprite ? `${promptSprite.name} спрашивает` : "Ожидается ответ"}
                         </h4>
@@ -1174,19 +1174,19 @@ export function ScratchStudio() {
               <CardContent className="space-y-4 p-5">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Console</p>
+                    <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Логи</p>
                     <h3 className="text-xl font-black text-[#26527c]">Лог выполнения</h3>
                   </div>
                   <div className="flex flex-wrap gap-2">
-                    <Badge variant="outline">{Object.keys(vmState.variables).length} vars</Badge>
+                    <Badge variant="outline">{Object.keys(vmState.variables).length} переменных</Badge>
                     <Badge variant={vmState.logs.some((entry) => entry.level === "error") ? "reward" : "info"}>
-                      {vmState.logs.length} logs
+                      {vmState.logs.length} логов
                     </Badge>
                   </div>
                 </div>
 
                 <div className="rounded-[24px] border border-[#d8ebff] bg-white p-4">
-                  <p className="text-xs font-black uppercase tracking-[0.24em] text-[#6f9ac5]">Variables</p>
+                  <p className="text-xs font-black uppercase tracking-[0.24em] text-[#6f9ac5]">Переменные</p>
                   <div className="mt-3 flex flex-wrap gap-2">
                     {Object.entries(vmState.variables).map(([name, value]) => (
                       <div key={name} className="rounded-full bg-[#f4f9ff] px-3 py-1.5 text-sm font-semibold text-[#31557c]">
@@ -1233,7 +1233,7 @@ export function ScratchStudio() {
               <CardContent className="space-y-5 p-5">
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Tools</p>
+                    <p className="text-xs font-black uppercase tracking-[0.3em] text-[#6f9ac5]">Инструменты</p>
                     <h3 className="text-xl font-black text-[#26527c]">Управление проектом</h3>
                   </div>
                   <Badge variant="outline">{activeSprite?.name || "Без выбора"}</Badge>
@@ -1241,7 +1241,7 @@ export function ScratchStudio() {
 
                 <div className="grid grid-cols-2 gap-2 rounded-[24px] border border-[#d8ebff] bg-[#f7fbff] p-1">
                   {[
-                    { id: "sprites", label: "Спрайты" },
+                    { id: "sprites", label: "Сущности" },
                     { id: "gallery", label: "Галерея" },
                     { id: "inspector", label: "Инспектор" },
                     { id: "costumes", label: "Костюмы" }
@@ -1278,7 +1278,7 @@ export function ScratchStudio() {
               <div className="relative flex flex-wrap items-start justify-between gap-4">
                 <div className="space-y-3">
                   <div className="flex flex-wrap items-center gap-3">
-                    <Badge variant="reward">Workspace</Badge>
+                    <Badge variant="reward">Рабочая область</Badge>
                     <Badge
                       variant={vmState.status === "running" ? "reward" : vmState.status === "paused" ? "info" : "outline"}
                       className={vmState.status === "stopped" ? "border-white/80 bg-white/80 text-pop-ink" : ""}
@@ -1286,9 +1286,9 @@ export function ScratchStudio() {
                       {runtimeStatusLabel(vmState.status)}
                     </Badge>
                     <Badge variant="outline" className="border-white/80 bg-white/80 text-pop-ink">
-                      {sprites.length} sprites
+                      {sprites.length} сущностей
                     </Badge>
-                    <Badge variant="info">{vmState.logs.length} logs</Badge>
+                    <Badge variant="info">{vmState.logs.length} логов</Badge>
                   </div>
                   <div>
                     <p className="text-xs font-black uppercase tracking-[0.32em] text-[#6f9ac5]">Step 3</p>

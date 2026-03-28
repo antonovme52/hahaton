@@ -3,21 +3,21 @@
 @tailwind utilities;
 
 :root {
-  --background: 42 100% 98%;
-  --foreground: 221 34% 17%;
+  --background: 210 100% 98%;
+  --foreground: 226 32% 20%;
   --card: 0 0% 100%;
-  --card-foreground: 221 34% 17%;
-  --primary: 17 100% 66%;
+  --card-foreground: 226 32% 20%;
+  --primary: 224 82% 76%;
   --primary-foreground: 0 0% 100%;
-  --secondary: 153 74% 88%;
-  --secondary-foreground: 160 50% 19%;
-  --accent: 201 100% 86%;
-  --accent-foreground: 218 38% 21%;
-  --muted: 42 100% 96%;
-  --muted-foreground: 220 18% 41%;
-  --border: 220 24% 88%;
-  --input: 220 24% 88%;
-  --ring: 17 100% 66%;
+  --secondary: 201 100% 94%;
+  --secondary-foreground: 223 38% 28%;
+  --accent: 256 100% 95%;
+  --accent-foreground: 248 34% 29%;
+  --muted: 210 100% 97%;
+  --muted-foreground: 224 17% 42%;
+  --border: 220 42% 90%;
+  --input: 220 42% 90%;
+  --ring: 224 82% 76%;
   --radius: 1.25rem;
   --font-sans: "Trebuchet MS", "Segoe UI", sans-serif;
 }
@@ -29,9 +29,9 @@
 body {
   @apply min-h-screen bg-background text-[17px] text-foreground antialiased;
   background-image:
-    radial-gradient(circle at 15% 15%, rgba(255, 209, 102, 0.22), transparent 22%),
-    radial-gradient(circle at 85% 10%, rgba(143, 125, 255, 0.16), transparent 20%),
-    linear-gradient(180deg, #fff9f0 0%, #f6fbff 100%);
+    radial-gradient(circle at 14% 14%, rgba(158, 216, 255, 0.28), transparent 24%),
+    radial-gradient(circle at 86% 12%, rgba(199, 184, 255, 0.22), transparent 22%),
+    linear-gradient(180deg, #fbfdff 0%, #f5f8ff 52%, #f8f5ff 100%);
 }
 
 a {

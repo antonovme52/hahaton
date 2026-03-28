@@ -1,12 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { CheckCircle2, Sparkles, WandSparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { PracticeStage } from "@/components/mini-games/practice-stage";
+import { SuccessBurst } from "@/components/gamification/success-burst";
 import { XpCounter } from "@/components/gamification/xp-counter";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -73,7 +74,9 @@ export function TopicLearningExperience({
     unlocked: string[];
     quizUnlocked: boolean;
   }>(null);
+  const [showBurst, setShowBurst] = useState(false);
   const [autoMoved, setAutoMoved] = useState(false);
+  const burstTimeoutRef = useRef<number | null>(null);
   const router = useRouter();
   const setCelebration = useLearningStore((state) => state.setCelebration);
 
@@ -120,6 +123,14 @@ export function TopicLearningExperience({
 
     if (response.ok) {
       setResult(data);
+      if (burstTimeoutRef.current) {
+        window.clearTimeout(burstTimeoutRef.current);
+      }
+      setShowBurst(true);
+      burstTimeoutRef.current = window.setTimeout(() => {
+        setShowBurst(false);
+        burstTimeoutRef.current = null;
+      }, 1400);
       setCelebration(`+${xpReward} XP получено`);
       router.refresh();
     }
@@ -324,7 +335,8 @@ export function TopicLearningExperience({
                                   ) : null}
                                 </div>
                                 {result ? (
-                                  <div className="animate-success-pulse rounded-[24px] bg-secondary p-4 text-secondary-foreground">
+                                  <div className="relative animate-success-pulse rounded-[24px] bg-secondary p-4 text-secondary-foreground">
+                                    <SuccessBurst active={showBurst} />
                                     <div className="mb-2 flex items-center gap-2 font-semibold">
                                       <Sparkles className="h-5 w-5" />
                                       Тема завершена

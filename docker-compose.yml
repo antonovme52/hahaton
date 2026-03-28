@@ -4,7 +4,7 @@ services:
     container_name: postgres-popub
     environment:
       POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
+      POSTGRES_PASSWORD: moyp5008
       POSTGRES_DB: popub_learn
     ports:
       - "55432:5432"

@@ -1,35 +1,35 @@
-import { Layers3, Rocket, Sparkles, Wand2 } from "lucide-react";
+import { Layers3, Rocket, Sparkles, Wand2 } from "lucide-react"
 
-import { AppShell } from "@/components/layout/app-shell";
-import { ScratchStudio } from "@/components/programming/scratch-studio";
-import { requireRole } from "@/lib/permissions";
+import { AppShell } from "@/components/layout/app-shell"
+import { ScratchStudio } from "@/components/programming/scratch-studio"
+import { requireRole } from "@/lib/permissions"
 
 const highlights = [
-  { label: "Блоки", value: "drag & drop логика" },
-  { label: "Сцена", value: "спрайты и костюмы" },
-  { label: "Запуск", value: "сразу видно результат" }
-];
+  { label: "Блоки", value: "логика без кода" },
+  { label: "Сцена", value: "сущности и костюмы" },
+  { label: "Запуск", value: "результат сразу" },
+]
 
 const capabilities = [
   {
     icon: Layers3,
-    title: "Собирай программу визуально",
-    text: "Редактор блоков помогает сфокусироваться на логике, а не на синтаксисе."
+    title: "Собирай программу из блоков",
+    text: "Сначала идея и логика, потом практика.",
   },
   {
     icon: Wand2,
-    title: "Настраивай собственную сцену",
-    text: "Добавляй героев, двигай их мышью, меняй образы и собирай небольшие истории."
+    title: "Настраивай сцену",
+    text: "Добавляй сущности и меняй их поведение.",
   },
   {
     icon: Rocket,
-    title: "Проверяй идею сразу",
-    text: "Флаг, пауза, стоп и консоль позволяют быстро понять, как ведёт себя сценарий."
-  }
-];
+    title: "Проверяй сразу",
+    text: "Запуск и пауза помогают быстро проверить сценарий.",
+  },
+]
 
 export default async function ProgrammingGamePage() {
-  await requireRole("student");
+  await requireRole("student")
 
   return (
     <AppShell role="student">
@@ -49,17 +49,16 @@ export default async function ProgrammingGamePage() {
                   Code Quest
                 </span>
                 <span className="inline-flex items-center rounded-full border border-white/80 bg-white/70 px-4 py-1.5 text-sm font-semibold text-foreground">
-                  Scratch-like editor
+                  Визуальный редактор
                 </span>
               </div>
 
               <h1 className="mt-5 text-4xl font-black leading-tight text-pop-ink sm:text-5xl">
-                Визуальный редактор, в котором код ощущается как сборка сцен и правил.
+                Code Quest для первых шагов в программировании.
               </h1>
 
               <p className="mt-4 max-w-3xl text-base leading-7 text-slate-600 sm:text-lg">
-                Собирай сценарии из цветных блоков, управляй героями на сцене, переключай костюмы и проверяй идею
-                сразу после запуска. Экран стал чище и собраннее, чтобы легче было фокусироваться на самом процессе.
+                Собирай сценарии из блоков, управляй сущностями и сразу смотри результат.
               </p>
 
               <div className="mt-6 grid gap-3 sm:grid-cols-3">
@@ -74,7 +73,7 @@ export default async function ProgrammingGamePage() {
 
             <div className="grid gap-4">
               {capabilities.map((item) => {
-                const Icon = item.icon;
+                const Icon = item.icon
 
                 return (
                   <div key={item.title} className="rounded-[28px] border border-white/70 bg-white/78 p-5 backdrop-blur">
@@ -88,7 +87,7 @@ export default async function ProgrammingGamePage() {
                       </div>
                     </div>
                   </div>
-                );
+                )
               })}
             </div>
           </div>
@@ -97,5 +96,5 @@ export default async function ProgrammingGamePage() {
         <ScratchStudio />
       </div>
     </AppShell>
-  );
+  )
 }

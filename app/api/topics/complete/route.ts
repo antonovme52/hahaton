@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
+import { logStudentActivity } from "@/lib/activity";
 import { awardAchievementIfNeeded } from "@/lib/achievements";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -43,6 +44,7 @@ export async function POST(request: Request) {
 
   let newXp = student.xp;
   let newLevel = calculateLevelFromXp(newXp);
+  let updatedStreak = student.streak;
 
   await prisma.$transaction(async (tx) => {
     await tx.topicProgress.upsert({
@@ -81,29 +83,20 @@ export async function POST(request: Request) {
     await tx.studentProfile.update({
       where: { id: student.id },
       data: {
-        currentModuleId: topic.moduleId,
-        streak: {
-          increment: 1
-        }
+        currentModuleId: topic.moduleId
       }
     });
 
-    await tx.activityLog.create({
-      data: {
-        studentId: student.id,
-        type: "topic_completed",
-        payload: {
-          topicId: topic.id,
-          topicTitle: topic.title,
-          xpGained: topic.xpReward,
-          homeworkText: body.homeworkText || ""
-        }
+    updatedStreak = await logStudentActivity(tx, {
+      studentId: student.id,
+      type: "topic_completed",
+      payload: {
+        topicId: topic.id,
+        topicTitle: topic.title,
+        xpGained: topic.xpReward,
+        homeworkText: body.homeworkText || ""
       }
     });
-  });
-
-  const updatedStudent = await prisma.studentProfile.findUniqueOrThrow({
-    where: { id: student.id }
   });
 
   const completedTopics = await prisma.topicProgress.count({
@@ -122,7 +115,7 @@ export async function POST(request: Request) {
     }
   }
 
-  if (updatedStudent.streak >= 3) {
+  if (updatedStreak >= 3) {
     const reward = await awardAchievementIfNeeded(session.user.id, "STREAK_3");
     if (reward) {
       unlocked.push(reward.achievement.title);

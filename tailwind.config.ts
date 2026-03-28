@@ -37,12 +37,12 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))"
         },
         pop: {
-          coral: "#ff7a59",
-          mint: "#89f0c2",
-          sky: "#6cc7ff",
-          sun: "#ffd166",
-          plum: "#8f7dff",
-          ink: "#1f2940"
+          coral: "#8fa8ff",
+          mint: "#e6f7ff",
+          sky: "#9ed8ff",
+          sun: "#f4f8ff",
+          plum: "#c7b8ff",
+          ink: "#24304f"
         }
       },
       borderRadius: {
@@ -55,7 +55,7 @@ const config: Config = {
       },
       backgroundImage: {
         "hero-grid":
-          "radial-gradient(circle at top left, rgba(255, 122, 89, 0.18), transparent 30%), radial-gradient(circle at bottom right, rgba(108, 199, 255, 0.2), transparent 28%)"
+          "radial-gradient(circle at top left, rgba(143, 168, 255, 0.18), transparent 30%), radial-gradient(circle at bottom right, rgba(158, 216, 255, 0.22), transparent 28%)"
       },
       fontFamily: {
         sans: ["var(--font-sans)"]
