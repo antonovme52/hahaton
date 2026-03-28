@@ -1,9 +1,10 @@
 import { prisma } from "@/lib/prisma";
+import { getOrCreateStudentProfile } from "@/lib/profiles";
 import { canAccessQuiz, getModuleProgress } from "@/lib/progress";
+import { getAssignmentCategory } from "@/lib/assignments";
 
 export async function getStudentDashboardData(userId: string) {
-  const student = await prisma.studentProfile.findUniqueOrThrow({
-    where: { userId },
+  const student = await getOrCreateStudentProfile(userId, {
     include: {
       user: true,
       topicProgress: {
@@ -62,9 +63,7 @@ export async function getStudentDashboardData(userId: string) {
 }
 
 export async function getModulesPageData(userId: string) {
-  const student = await prisma.studentProfile.findUniqueOrThrow({
-    where: { userId }
-  });
+  const student = await getOrCreateStudentProfile(userId);
 
   const modules = await prisma.module.findMany({
     include: {
@@ -89,9 +88,7 @@ export async function getModulesPageData(userId: string) {
 }
 
 export async function getModuleDetails(userId: string, slug: string) {
-  const student = await prisma.studentProfile.findUniqueOrThrow({
-    where: { userId }
-  });
+  const student = await getOrCreateStudentProfile(userId);
 
   const learningModule = await prisma.module.findUniqueOrThrow({
     where: { slug },
@@ -116,9 +113,7 @@ export async function getModuleDetails(userId: string, slug: string) {
 }
 
 export async function getTopicDetails(userId: string, moduleSlug: string, topicSlug: string) {
-  const student = await prisma.studentProfile.findUniqueOrThrow({
-    where: { userId }
-  });
+  const student = await getOrCreateStudentProfile(userId);
 
   const learningModule = await prisma.module.findUniqueOrThrow({
     where: { slug: moduleSlug }
@@ -148,9 +143,7 @@ export async function getTopicDetails(userId: string, moduleSlug: string, topicS
 }
 
 export async function getQuizDetails(userId: string, moduleSlug: string) {
-  const student = await prisma.studentProfile.findUniqueOrThrow({
-    where: { userId }
-  });
+  const student = await getOrCreateStudentProfile(userId);
 
   const learningModule = await prisma.module.findUniqueOrThrow({
     where: { slug: moduleSlug },
@@ -184,8 +177,7 @@ export async function getQuizDetails(userId: string, moduleSlug: string) {
 }
 
 export async function getProfileData(userId: string) {
-  const student = await prisma.studentProfile.findUniqueOrThrow({
-    where: { userId },
+  const student = await getOrCreateStudentProfile(userId, {
     include: {
       user: true
     }
@@ -272,11 +264,62 @@ export async function getParentOverview(userId: string) {
     take: 6
   });
 
+  const groupIds = await prisma.groupMembership.findMany({
+    where: { studentId: child.id },
+    select: { groupId: true }
+  });
+
+  const assignments = groupIds.length
+    ? await prisma.teacherAssignment.findMany({
+        where: {
+          status: "published",
+          groups: {
+            some: {
+              groupId: {
+                in: groupIds.map((membership) => membership.groupId)
+              }
+            }
+          }
+        },
+        include: {
+          module: true,
+          topic: true,
+          teacher: {
+            include: {
+              user: true
+            }
+          },
+          attempts: {
+            where: { studentId: child.id },
+            orderBy: { submittedAt: "desc" }
+          }
+        },
+        orderBy: [{ dueAt: "asc" }, { createdAt: "desc" }]
+      })
+    : [];
+
+  const childAssignments = assignments.map((assignment) => ({
+    ...assignment,
+    category: getAssignmentCategory(assignment.assignmentType),
+    latestAttempt: assignment.attempts[0] || null,
+    attemptCount: assignment.attempts.length,
+    hasCompletedAttempt: assignment.attempts.some((attempt) => attempt.isCorrect)
+  }));
+
+  const assignmentSummary = {
+    total: childAssignments.length,
+    completed: childAssignments.filter((assignment) => assignment.hasCompletedAttempt).length,
+    inProgress: childAssignments.filter((assignment) => !assignment.hasCompletedAttempt && assignment.attemptCount > 0).length,
+    notStarted: childAssignments.filter((assignment) => assignment.attemptCount === 0).length
+  };
+
   return {
     parent,
     child,
     achievements,
     moduleStats,
-    recentActivity
+    recentActivity,
+    assignments: childAssignments,
+    assignmentSummary
   };
 }

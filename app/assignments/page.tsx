@@ -7,6 +7,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   assignmentCategoryLabels,
   assignmentDifficultyLabels,
+  getAssignmentProgressMeta,
+  getAssignmentProgressState,
   assignmentTypeLabels
 } from "@/lib/assignments";
 import { requireRole } from "@/lib/permissions";
@@ -48,37 +50,49 @@ export default async function AssignmentsPage() {
                 <p className="text-sm text-muted-foreground">{group.items.length} заданий</p>
               </div>
               <div className="grid gap-4 xl:grid-cols-2">
-                {group.items.map((assignment) => (
-                  <Card key={assignment.id}>
-                    <CardContent className="space-y-4 p-6">
-                      <div className="flex flex-wrap gap-2">
-                        <Badge variant={assignment.category === "programming" ? "reward" : "outline"}>
-                          {assignmentCategoryLabels[assignment.category]}
-                        </Badge>
-                        <Badge variant="info">{assignmentTypeLabels[assignment.assignmentType]}</Badge>
-                        <Badge variant="outline">{assignmentDifficultyLabels[assignment.difficulty]}</Badge>
-                        <Badge variant="reward">+{assignment.xpReward} XP</Badge>
-                      </div>
-                      <div>
-                        <h2 className="text-2xl font-bold text-pop-ink">{assignment.title}</h2>
-                        <p className="mt-2 text-muted-foreground">{assignment.description}</p>
-                      </div>
-                      <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
-                        <span>Учитель: {assignment.teacher.user.name}</span>
-                        <span>Модуль: {assignment.module?.title || "Без модуля"}</span>
-                        <span>Дедлайн: {assignment.dueAt ? formatDate(assignment.dueAt) : "Без даты"}</span>
-                      </div>
-                      <div className="flex flex-wrap gap-3">
-                        {assignment.groups.map((groupItem) => (
-                          <Badge key={groupItem.group.id} variant="outline">{groupItem.group.name}</Badge>
-                        ))}
-                      </div>
-                      <Button asChild>
-                        <Link href={`/assignments/${assignment.id}`}>Открыть задание</Link>
-                      </Button>
-                    </CardContent>
-                  </Card>
-                ))}
+                {group.items.map((assignment) => {
+                  const progressMeta = getAssignmentProgressMeta(
+                    getAssignmentProgressState({
+                      hasCompletedAttempt: assignment.hasCompletedAttempt,
+                      attemptCount: assignment.attemptCount
+                    })
+                  );
+
+                  return (
+                    <Card key={assignment.id}>
+                      <CardContent className="space-y-4 p-6">
+                        <div className="flex flex-wrap gap-2">
+                          <Badge variant={assignment.category === "programming" ? "reward" : "outline"}>
+                            {assignmentCategoryLabels[assignment.category]}
+                          </Badge>
+                          <Badge variant="info">{assignmentTypeLabels[assignment.assignmentType]}</Badge>
+                          <Badge variant="outline">{assignmentDifficultyLabels[assignment.difficulty]}</Badge>
+                          <Badge variant="reward">+{assignment.xpReward} XP</Badge>
+                          <Badge variant={progressMeta.variant}>{progressMeta.label}</Badge>
+                        </div>
+                        <div>
+                          <h2 className="text-2xl font-bold text-pop-ink">{assignment.title}</h2>
+                          <p className="mt-2 text-muted-foreground">{assignment.description}</p>
+                        </div>
+                        <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                          <span>Учитель: {assignment.teacher.user.name}</span>
+                          <span>Модуль: {assignment.module?.title || "Без модуля"}</span>
+                          <span>Дедлайн: {assignment.dueAt ? formatDate(assignment.dueAt) : "Без даты"}</span>
+                          <span>Попыток: {assignment.attemptCount}</span>
+                          <span>Последний score: {assignment.latestAttempt ? `${assignment.latestAttempt.score}%` : "нет"}</span>
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                          {assignment.groups.map((groupItem) => (
+                            <Badge key={groupItem.group.id} variant="outline">{groupItem.group.name}</Badge>
+                          ))}
+                        </div>
+                        <Button asChild>
+                          <Link href={`/assignments/${assignment.id}`}>Открыть задание</Link>
+                        </Button>
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             </section>
           ) : null

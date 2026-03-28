@@ -38,88 +38,253 @@ export type ProgrammingGameSummary = {
   bestCompletedScore: number;
 };
 
+export type ScratchBlockTone = "event" | "motion" | "control" | "logic" | "action";
+
+export type ScratchQuestBlock = {
+  id: string;
+  label: string;
+  tone: ScratchBlockTone;
+  helper?: string;
+  maxCount?: number;
+};
+
+export type ScratchQuestChoiceOption = {
+  id: string;
+  label: string;
+  helper?: string;
+};
+
+export type ScratchQuestChoiceSlot = {
+  id: string;
+  label: string;
+  options: ScratchQuestChoiceOption[];
+  expected: string;
+};
+
+export type ScratchQuestSequenceContent = {
+  gameMode: "scratch";
+  scratchTask: "sequence";
+  prompt: string;
+  description?: string;
+  hints: string[];
+  timeLimitSec?: number;
+  sceneTitle: string;
+  sceneDescription: string;
+  sceneGoal: string;
+  characterEmoji: string;
+  goalEmoji: string;
+  pathLength: number;
+  paletteTitle?: string;
+  workspaceTitle?: string;
+  blocks: ScratchQuestBlock[];
+  expectedOrder: string[];
+  successMessage?: string;
+  failureMessage?: string;
+};
+
+export type ScratchQuestChoicesContent = {
+  gameMode: "scratch";
+  scratchTask: "choices";
+  prompt: string;
+  description?: string;
+  hints: string[];
+  timeLimitSec?: number;
+  sceneTitle: string;
+  sceneDescription: string;
+  sceneGoal: string;
+  characterEmoji: string;
+  goalEmoji: string;
+  pathLength: number;
+  slots: ScratchQuestChoiceSlot[];
+  successMessage?: string;
+  failureMessage?: string;
+};
+
+export type ScratchQuestContent = ScratchQuestSequenceContent | ScratchQuestChoicesContent;
+
+type ScratchQuestSequenceAnswer = {
+  blockIds: string[];
+};
+
+type ScratchQuestChoicesAnswer = {
+  slotAnswers: Record<string, string>;
+};
+
 export const programmingGameLevels: ProgrammingGameLevel[] = [
   {
     key: "arrays-bridge",
     order: 1,
-    title: "Array Bridge",
-    description: "Собери код так, чтобы массив показал любимые команды.",
+    title: "Робо-разминка",
+    description: "Собери программу из блоков, чтобы робот добрался до кристалла.",
     xpReward: 25,
     type: AssignmentType.code_order,
-    hints: ["Сначала создаём массив, потом выводим его."],
+    hints: ["Программа начинается с блока старта.", "Роботу нужно сделать два шага и только потом взять кристалл."],
     timeLimitSec: 90,
     content: {
-      prompt: "Расставь строки так, чтобы код корректно вывел первый элемент массива.",
+      gameMode: "scratch",
+      scratchTask: "sequence",
+      prompt: "Собери первую программу робота из блоков, как в Scratch.",
+      description: "Добавляй блоки в программу и двигай их вверх или вниз, пока робот не дойдёт до цели.",
+      hints: ["Программа начинается с блока старта.", "Роботу нужно сделать два шага и только потом взять кристалл."],
+      timeLimitSec: 90,
+      sceneTitle: "Полоса запуска",
+      sceneDescription: "Робот стоит у старта, а кристалл лежит через две клетки.",
+      sceneGoal: "Дойди до кристалла",
+      characterEmoji: "🤖",
+      goalEmoji: "💎",
+      pathLength: 4,
+      paletteTitle: "Палитра блоков",
+      workspaceTitle: "Программа робота",
       blocks: [
-        "console.log(teams[0]);",
-        "const teams = ['alpha', 'beta', 'gamma'];"
+        { id: "start", label: "Когда нажали старт", tone: "event" },
+        { id: "move", label: "Шаг вперёд", tone: "motion", maxCount: 2 },
+        { id: "turn", label: "Повернуть налево", tone: "motion" },
+        { id: "collect", label: "Взять кристалл", tone: "action" }
       ],
-      expectedOrder: [
-        "const teams = ['alpha', 'beta', 'gamma'];",
-        "console.log(teams[0]);"
-      ],
-      hints: ["Массив нужно объявить до console.log."],
-      explanation: "Инициализация всегда идёт раньше чтения значения."
+      expectedOrder: ["start", "move", "move", "collect"],
+      successMessage: "Робот добрался до кристалла. Отличный старт!",
+      failureMessage: "Проверь порядок: сначала старт, потом два шага, а кристалл берём в самом конце."
     }
   },
   {
     key: "loops-race",
     order: 2,
-    title: "Loops Race",
-    description: "Заполни цикл и добеги до финиша без синтаксических ловушек.",
+    title: "Петля ускорения",
+    description: "Настрой блок повторения, чтобы бот собрал все звёзды.",
     xpReward: 30,
     type: AssignmentType.code_gaps,
-    hints: ["Стартуй с 1 и выводи счётчик steps."],
+    hints: ["Звёзд три, значит повторять нужно три раза.", "Внутри цикла должен быть именно прыжок вперёд."],
     timeLimitSec: 120,
     content: {
-      prompt: "Заполни пропуски так, чтобы цикл вывел числа 1, 2 и 3.",
-      template: "for (let steps = __0__; steps <= __1__; steps++) {\n  console.log(__2__);\n}",
-      gapLabels: ["start", "limit", "value"],
-      expectedGaps: ["1", "3", "steps"],
-      hints: ["Нужен старт с 1 и предел 3."],
-      explanation: "Условие <= позволяет включить верхнюю границу."
+      gameMode: "scratch",
+      scratchTask: "choices",
+      prompt: "Собери блок повторения так, чтобы робот забрал три звезды подряд.",
+      description: "В Scratch цикл помогает не повторять одинаковые действия вручную.",
+      hints: ["Звёзд три, значит повторять нужно три раза.", "Внутри цикла должен быть именно прыжок вперёд."],
+      timeLimitSec: 120,
+      sceneTitle: "Звёздная дорожка",
+      sceneDescription: "Перед ботом три одинаковых прыжка до трёх звёзд.",
+      sceneGoal: "Собери все 3 звезды",
+      characterEmoji: "🤖",
+      goalEmoji: "⭐",
+      pathLength: 3,
+      slots: [
+        {
+          id: "count",
+          label: "Сколько раз повторять?",
+          expected: "3",
+          options: [
+            { id: "2", label: "2 раза" },
+            { id: "3", label: "3 раза" },
+            { id: "4", label: "4 раза" }
+          ]
+        },
+        {
+          id: "action",
+          label: "Что делать внутри цикла?",
+          expected: "jump",
+          options: [
+            { id: "jump", label: "Прыжок вперёд" },
+            { id: "wait", label: "Подождать" },
+            { id: "turn", label: "Повернуться" }
+          ]
+        }
+      ],
+      successMessage: "Цикл настроен верно: бот собрал все звёзды за один алгоритм.",
+      failureMessage: "Ещё немного. Выбери такое повторение, чтобы движения хватило ровно на три звезды."
     }
   },
   {
     key: "condition-rescue",
     order: 3,
-    title: "Condition Rescue",
-    description: "Поймай баг в условии и верни код в рабочее состояние.",
+    title: "Умный светофор",
+    description: "Почини логику блоков, чтобы робот реагировал на цвет правильно.",
     xpReward: 35,
     type: AssignmentType.bug_fix,
-    hints: ["Условие в JavaScript должно быть обёрнуто в круглые скобки."],
+    hints: ["Зелёный свет разрешает идти.", "Если условие не выполнено, роботу нужно ждать."],
     timeLimitSec: 135,
     content: {
-      prompt: "Исправь код так, чтобы при score >= 80 выводилось passed.",
-      starterCode: "if score >= 80 {\n  console.log('passed');\n}",
-      expectedAnswer: "if (score >= 80) {\n  console.log('passed');\n}",
-      acceptedAnswers: [
-        "if(score>=80){console.log('passed');}",
-        "if (score >= 80) {\nconsole.log('passed');\n}"
+      gameMode: "scratch",
+      scratchTask: "choices",
+      prompt: "Исправь испорченный сценарий светофора, не используя текстовые команды.",
+      description: "Нужно выбрать правильное условие и две реакции робота.",
+      hints: ["Зелёный свет разрешает идти.", "Если условие не выполнено, роботу нужно ждать."],
+      timeLimitSec: 135,
+      sceneTitle: "Перекрёсток",
+      sceneDescription: "Робот ждёт у перехода и смотрит на светофор.",
+      sceneGoal: "Пусть герой идёт только на зелёный",
+      characterEmoji: "🤖",
+      goalEmoji: "🚦",
+      pathLength: 3,
+      slots: [
+        {
+          id: "condition",
+          label: "Когда можно идти?",
+          expected: "green",
+          options: [
+            { id: "red", label: "Если горит красный" },
+            { id: "green", label: "Если горит зелёный" },
+            { id: "yellow", label: "Если горит жёлтый" }
+          ]
+        },
+        {
+          id: "actionTrue",
+          label: "Что делаем при верном условии?",
+          expected: "move",
+          options: [
+            { id: "move", label: "Идти вперёд" },
+            { id: "dance", label: "Танцевать на месте" },
+            { id: "wait", label: "Ждать" }
+          ]
+        },
+        {
+          id: "actionFalse",
+          label: "Что делаем иначе?",
+          expected: "wait",
+          options: [
+            { id: "move", label: "Идти вперёд" },
+            { id: "wait", label: "Ждать" },
+            { id: "spin", label: "Крутиться" }
+          ]
+        }
       ],
-      hints: ["Синтаксис JavaScript для условия начинается с if (...)."],
-      explanation: "В JavaScript условие всегда записывается как if (условие) { ... }."
+      successMessage: "Логика исправлена: робот теперь безопасно переходит дорогу.",
+      failureMessage: "Сценарий ещё путает сигналы. Сверь, какое действие должно быть на зелёный и какое на остальные цвета."
     }
   },
   {
     key: "function-sprint",
     order: 4,
-    title: "Function Sprint",
-    description: "Напиши небольшую функцию с нуля и закрой финальный уровень.",
+    title: "Парад победы",
+    description: "Собери финальную программу из блоков и устрой победный марш.",
     xpReward: 45,
     type: AssignmentType.code_writing,
-    hints: ["Функция должна возвращать квадрат числа."],
+    hints: ["Сначала запускаем программу.", "Потом два шага вправо, а затем праздничное действие."],
     timeLimitSec: 180,
     content: {
-      prompt: "Напиши функцию square(num), которая возвращает квадрат числа.",
-      starterCode: "function square(num) {\n  \n}",
-      expectedAnswer: "function square(num) {\n  return num * num;\n}",
-      acceptedAnswers: [
-        "function square(num){return num * num;}",
-        "function square(num){\nreturn num * num;\n}"
+      gameMode: "scratch",
+      scratchTask: "sequence",
+      prompt: "Собери финальную программу героя: старт, два шага вправо и победное 'Ура!'.",
+      description: "Финальный уровень собирает всё вместе: старт, порядок действий и аккуратный алгоритм.",
+      hints: ["Сначала запускаем программу.", "Потом два шага вправо, а затем праздничное действие."],
+      timeLimitSec: 180,
+      sceneTitle: "Финишная сцена",
+      sceneDescription: "Герой должен дойти до пьедестала и отпраздновать победу.",
+      sceneGoal: "Дойди до пьедестала и скажи 'Ура!'",
+      characterEmoji: "🦊",
+      goalEmoji: "🏆",
+      pathLength: 4,
+      paletteTitle: "Блоки финала",
+      workspaceTitle: "Сценарий парада",
+      blocks: [
+        { id: "start", label: "Когда нажали старт", tone: "event" },
+        { id: "step-right", label: "Шаг вправо", tone: "motion", maxCount: 2 },
+        { id: "jump", label: "Прыжок", tone: "motion" },
+        { id: "celebrate", label: "Сказать «Ура!»", tone: "action" }
       ],
-      hints: ["Используй return и умножение num на num."],
-      explanation: "Квадрат числа - это произведение значения само на себя."
+      expectedOrder: ["start", "step-right", "step-right", "celebrate"],
+      successMessage: "Парад собран идеально. Герой дошёл до пьедестала и победно отметил финиш!",
+      failureMessage: "Пока не совсем тот сценарий. Проверь, хватает ли шагов до пьедестала и стоит ли праздник в самом конце."
     }
   }
 ];
@@ -175,11 +340,56 @@ export function buildProgrammingGameState(progressEntries: ProgrammingGameProgre
   };
 }
 
+function clampScore(value: number) {
+  return Math.max(0, Math.min(100, Math.round(value)));
+}
+
+export function isScratchQuestContent(content: unknown): content is ScratchQuestContent {
+  return Boolean(content && typeof content === "object" && (content as { gameMode?: string }).gameMode === "scratch");
+}
+
+function evaluateScratchQuestLevel(content: ScratchQuestContent, answer: unknown) {
+  if (content.scratchTask === "sequence") {
+    const parsedAnswer = answer as ScratchQuestSequenceAnswer;
+    const blockIds = Array.isArray(parsedAnswer?.blockIds) ? parsedAnswer.blockIds : [];
+    const expectedOrder = content.expectedOrder;
+    const correctPositions = expectedOrder.reduce((count, blockId, index) => {
+      return count + (blockIds[index] === blockId ? 1 : 0);
+    }, 0);
+    const isCorrect = blockIds.length === expectedOrder.length && correctPositions === expectedOrder.length;
+
+    return {
+      isCorrect,
+      score: clampScore((correctPositions / expectedOrder.length) * 100),
+      message: isCorrect
+        ? content.successMessage || "Программа собрана верно."
+        : content.failureMessage || "Проверь порядок блоков в программе."
+    };
+  }
+
+  const parsedAnswer = answer as ScratchQuestChoicesAnswer;
+  const answers = parsedAnswer?.slotAnswers && typeof parsedAnswer.slotAnswers === "object" ? parsedAnswer.slotAnswers : {};
+  const correctCount = content.slots.reduce((count, slot) => count + (answers[slot.id] === slot.expected ? 1 : 0), 0);
+  const isCorrect = correctCount === content.slots.length;
+
+  return {
+    isCorrect,
+    score: clampScore((correctCount / content.slots.length) * 100),
+    message: isCorrect
+      ? content.successMessage || "Все блоки настроены правильно."
+      : content.failureMessage || "Один или несколько блоков ещё требуют настройки."
+  };
+}
+
 export function evaluateProgrammingLevel(levelKey: string, answer: unknown) {
   const level = getProgrammingGameLevel(levelKey);
 
   if (!level) {
     throw new Error("Level not found");
+  }
+
+  if (isScratchQuestContent(level.content)) {
+    return evaluateScratchQuestLevel(level.content, answer);
   }
 
   return evaluateAssignmentAnswer(level.type, level.content, answer);

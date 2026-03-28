@@ -36,7 +36,7 @@ export function InteractiveTaskRunner({
   isSubmitting?: boolean;
   result?: SubmissionResult | null;
 }) {
-  const [startedAt, setStartedAt] = useState(() => new Date().toISOString());
+  const [startedAt] = useState(() => new Date().toISOString());
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [freeText, setFreeText] = useState("");
   const [code, setCode] = useState(String(content.starterCode || ""));
@@ -64,18 +64,6 @@ export function InteractiveTaskRunner({
     typeof remainingSec === "number" && typeof warningThreshold === "number"
       ? remainingSec > 0 && remainingSec <= warningThreshold
       : false;
-
-  useEffect(() => {
-    setStartedAt(new Date().toISOString());
-    setSelectedIndex(null);
-    setFreeText("");
-    setCode(String(content.starterCode || ""));
-    setOrderedBlocks(Array.isArray(content.blocks) ? [...(content.blocks as string[])] : []);
-    setGaps(Array.isArray(content.expectedGaps) ? new Array((content.expectedGaps as string[]).length).fill("") : []);
-    setDragIndex(null);
-    setRevealedHintCount(0);
-    setNowMs(Date.now());
-  }, [assignmentType, content]);
 
   useEffect(() => {
     if (typeof timeLimitSec !== "number") {

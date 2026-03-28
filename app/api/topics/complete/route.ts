@@ -4,6 +4,7 @@ import { z } from "zod";
 import { awardAchievementIfNeeded } from "@/lib/achievements";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getOrCreateStudentProfile } from "@/lib/profiles";
 import { calculateLevelFromXp, getModuleProgress } from "@/lib/progress";
 import { grantStudentXp } from "@/lib/xp";
 
@@ -21,9 +22,7 @@ export async function POST(request: Request) {
 
   const body = schema.parse(await request.json());
 
-  const student = await prisma.studentProfile.findUniqueOrThrow({
-    where: { userId: session.user.id }
-  });
+  const student = await getOrCreateStudentProfile(session.user.id);
 
   const topic = await prisma.topic.findUniqueOrThrow({
     where: { id: body.topicId }

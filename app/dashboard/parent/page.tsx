@@ -1,7 +1,10 @@
 import { AppShell } from "@/components/layout/app-shell";
 import { ChildOverviewCard } from "@/components/parent/child-overview-card";
+import { ParentChildLinkCard } from "@/components/parent/parent-child-link-card";
 import { AchievementGrid } from "@/components/gamification/achievement-grid";
+import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { getAssignmentProgressMeta, getAssignmentProgressState } from "@/lib/assignments";
 import { getParentOverview } from "@/lib/data";
 import { requireRole } from "@/lib/permissions";
 import { formatDate } from "@/lib/utils";
@@ -13,7 +16,16 @@ export default async function ParentDashboardPage() {
   if (!data) {
     return (
       <AppShell role="parent">
-        <p>Ребенок пока не привязан к родительскому аккаунту.</p>
+        <div className="space-y-4">
+          <div>
+            <p className="text-sm font-semibold uppercase tracking-wide text-pop-coral">Родительский кабинет</p>
+            <h1 className="text-4xl font-black text-pop-ink">Подключите ребенка к аккаунту</h1>
+            <p className="mt-2 text-muted-foreground">
+              После привязки здесь появятся темы, тесты, достижения и лента активности ученика.
+            </p>
+          </div>
+          <ParentChildLinkCard />
+        </div>
       </AppShell>
     );
   }
@@ -74,6 +86,60 @@ export default async function ParentDashboardPage() {
             </CardContent>
           </Card>
         </div>
+
+        <section className="space-y-4">
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h2 className="text-2xl font-bold">Назначенные задания</h2>
+              <p className="text-muted-foreground">Видно, что уже выполнено, где были попытки и что еще не начато.</p>
+            </div>
+            {data.assignmentSummary.total ? (
+              <div className="flex flex-wrap gap-2">
+                <Badge variant="reward">{data.assignmentSummary.completed}/{data.assignmentSummary.total} выполнено</Badge>
+                <Badge variant="info">{data.assignmentSummary.inProgress} в работе</Badge>
+                <Badge variant="outline">{data.assignmentSummary.notStarted} без попыток</Badge>
+              </div>
+            ) : null}
+          </div>
+
+          <Card>
+            <CardContent className="space-y-4 p-6">
+              {data.assignments.length ? (
+                data.assignments.slice(0, 4).map((assignment) => {
+                  const progressMeta = getAssignmentProgressMeta(
+                    getAssignmentProgressState({
+                      hasCompletedAttempt: assignment.hasCompletedAttempt,
+                      attemptCount: assignment.attemptCount
+                    })
+                  );
+
+                  return (
+                    <div key={assignment.id} className="rounded-[24px] bg-white/80 p-4">
+                      <div className="flex flex-wrap items-start justify-between gap-3">
+                        <div>
+                          <p className="font-semibold">{assignment.title}</p>
+                          <p className="text-sm text-muted-foreground">
+                            {assignment.teacher.user.name} • {assignment.module?.title || "Без модуля"}
+                          </p>
+                        </div>
+                        <Badge variant={progressMeta.variant}>{progressMeta.label}</Badge>
+                      </div>
+                      <div className="mt-3 flex flex-wrap gap-4 text-sm text-muted-foreground">
+                        <span>Попыток: {assignment.attemptCount}</span>
+                        <span>Последний score: {assignment.latestAttempt ? `${assignment.latestAttempt.score}%` : "нет"}</span>
+                        <span>Дедлайн: {assignment.dueAt ? formatDate(assignment.dueAt) : "Без даты"}</span>
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <p className="text-sm text-muted-foreground">
+                  У ребенка пока нет опубликованных teacher-заданий по его группам.
+                </p>
+              )}
+            </CardContent>
+          </Card>
+        </section>
 
         <section className="space-y-4">
           <h2 className="text-2xl font-bold">Достижения ребенка</h2>

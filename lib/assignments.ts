@@ -122,18 +122,164 @@ const baseAssignmentSchema = z.object({
 
 export const teacherAssignmentInputSchema = baseAssignmentSchema.superRefine((value, ctx) => {
   const result = getAssignmentContentSchema(value.assignmentType).safeParse(value.content);
+
+  if (value.status === AssignmentStatus.published && value.groupIds.length === 0) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Для опубликованного задания нужно выбрать хотя бы одну группу.",
+      path: ["groupIds"]
+    });
+  }
+
   if (!result.success) {
     for (const issue of result.error.issues) {
       ctx.addIssue({
-        code: z.ZodIssueCode.custom,
-        message: issue.message,
+        ...issue,
         path: ["content", ...issue.path]
       });
     }
+
+    return;
+  }
+
+  switch (value.assignmentType) {
+    case AssignmentType.multiple_choice:
+      if (result.data.expectedOptionIndex >= result.data.options.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Правильный ответ должен ссылаться на один из вариантов.",
+          path: ["content", "expectedOptionIndex"]
+        });
+      }
+      break;
+    case AssignmentType.free_text:
+      if (result.data.minimumKeywordMatches > result.data.expectedKeywords.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Минимум совпадений не может быть больше числа ключевых слов.",
+          path: ["content", "minimumKeywordMatches"]
+        });
+      }
+      break;
+    case AssignmentType.code_order:
+      if (result.data.blocks.length !== result.data.expectedOrder.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Количество блоков и строк в правильном порядке должно совпадать.",
+          path: ["content", "expectedOrder"]
+        });
+      }
+      break;
+    case AssignmentType.code_gaps:
+      if (result.data.gapLabels.length !== result.data.expectedGaps.length) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: "Количество названий пропусков и ожидаемых ответов должно совпадать.",
+          path: ["content", "expectedGaps"]
+        });
+      }
+      break;
   }
 });
 
 export type TeacherAssignmentInput = z.infer<typeof teacherAssignmentInputSchema>;
+
+const teacherAssignmentFieldLabels: Record<string, string> = {
+  title: "Заголовок",
+  description: "Описание",
+  assignmentType: "Тип задания",
+  difficulty: "Сложность",
+  status: "Статус",
+  moduleId: "Модуль",
+  topicId: "Тема",
+  subjectLabel: "Предмет",
+  xpReward: "XP",
+  publishedAt: "Дата публикации",
+  dueAt: "Дедлайн",
+  groupIds: "Группы",
+  "content.prompt": "Prompt",
+  "content.hints": "Подсказки",
+  "content.explanation": "Объяснение",
+  "content.options": "Варианты ответа",
+  "content.expectedOptionIndex": "Правильный вариант",
+  "content.placeholder": "Placeholder",
+  "content.expectedKeywords": "Ключевые слова",
+  "content.minimumKeywordMatches": "Минимум совпадений",
+  "content.starterCode": "Стартовый код",
+  "content.expectedAnswer": "Ожидаемый ответ",
+  "content.acceptedAnswers": "Допустимые варианты",
+  "content.blocks": "Блоки",
+  "content.expectedOrder": "Правильный порядок",
+  "content.template": "Шаблон",
+  "content.gapLabels": "Названия пропусков",
+  "content.expectedGaps": "Ожидаемые ответы"
+};
+
+function getTeacherAssignmentFieldLabel(path: (string | number)[]) {
+  if (!path.length) {
+    return "Форма";
+  }
+
+  const numericIndex = [...path].reverse().find((segment) => typeof segment === "number");
+  const normalizedPath = path.filter((segment): segment is string => typeof segment === "string").join(".");
+  const baseLabel = teacherAssignmentFieldLabels[normalizedPath] || normalizedPath || "Поле";
+
+  if (typeof numericIndex === "number") {
+    return `${baseLabel} #${numericIndex + 1}`;
+  }
+
+  return baseLabel;
+}
+
+function formatTeacherAssignmentIssue(issue: z.ZodIssue) {
+  const label = getTeacherAssignmentFieldLabel(issue.path);
+
+  if (issue.code === z.ZodIssueCode.invalid_type) {
+    return `${label}: заполните поле.`;
+  }
+
+  if (issue.code === z.ZodIssueCode.invalid_string && issue.validation === "datetime") {
+    return `${label}: укажите корректные дату и время.`;
+  }
+
+  if (issue.code === z.ZodIssueCode.too_small) {
+    if (issue.type === "string") {
+      return `${label}: минимум ${issue.minimum} символа(ов).`;
+    }
+
+    if (issue.type === "array") {
+      return `${label}: минимум ${issue.minimum} элемента(ов).`;
+    }
+
+    if (issue.type === "number") {
+      return `${label}: значение должно быть не меньше ${issue.minimum}.`;
+    }
+  }
+
+  if (issue.code === z.ZodIssueCode.too_big) {
+    if (issue.type === "string") {
+      return `${label}: максимум ${issue.maximum} символа(ов).`;
+    }
+
+    if (issue.type === "array") {
+      return `${label}: максимум ${issue.maximum} элемента(ов).`;
+    }
+
+    if (issue.type === "number") {
+      return `${label}: значение должно быть не больше ${issue.maximum}.`;
+    }
+  }
+
+  return `${label}: ${issue.message}`;
+}
+
+export function parseTeacherAssignmentInput(input: unknown) {
+  return teacherAssignmentInputSchema.safeParse(input);
+}
+
+export function formatTeacherAssignmentInputIssues(error: z.ZodError) {
+  return error.issues.map(formatTeacherAssignmentIssue).join(" ");
+}
 
 const multipleChoiceAnswerSchema = z.object({
   selectedIndex: z.number().int().nonnegative()
@@ -160,6 +306,46 @@ export type AssignmentEvaluationResult = {
   score: number;
   message: string;
 };
+
+export type AssignmentProgressState = "completed" | "in_progress" | "not_started";
+
+export function getAssignmentProgressState({
+  hasCompletedAttempt,
+  attemptCount
+}: {
+  hasCompletedAttempt: boolean;
+  attemptCount: number;
+}): AssignmentProgressState {
+  if (hasCompletedAttempt) {
+    return "completed";
+  }
+
+  if (attemptCount > 0) {
+    return "in_progress";
+  }
+
+  return "not_started";
+}
+
+export function getAssignmentProgressMeta(state: AssignmentProgressState) {
+  switch (state) {
+    case "completed":
+      return {
+        label: "Выполнено",
+        variant: "reward" as const
+      };
+    case "in_progress":
+      return {
+        label: "Есть попытка",
+        variant: "info" as const
+      };
+    case "not_started":
+      return {
+        label: "Новое",
+        variant: "outline" as const
+      };
+  }
+}
 
 function normalizeText(value: string) {
   return value.toLowerCase().replace(/\s+/g, " ").trim();

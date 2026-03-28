@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { AssignmentType } from "@prisma/client";
 import { Lock, Trophy } from "lucide-react";
@@ -8,8 +8,10 @@ import { useRouter } from "next/navigation";
 
 import { InteractiveTaskRunner } from "@/components/assignments/interactive-task-runner";
 import { XpCounter } from "@/components/gamification/xp-counter";
+import { CodeQuestRunner } from "@/components/programming/code-quest-runner";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { isScratchQuestContent } from "@/lib/programming-game";
 import { Progress } from "@/components/ui/progress";
 import { cn, formatDuration } from "@/lib/utils";
 
@@ -53,10 +55,9 @@ export function ProgrammingGameClient({
   summary: SummaryData;
 }) {
   const router = useRouter();
-  const initialSelectedKey = summary.nextLevelKey || levels.find((level) => !level.locked)?.key || levels[0]?.key || "";
-  const [selectedKey, setSelectedKey] = useState(initialSelectedKey);
+  const fallbackSelectedKey = summary.nextLevelKey || levels.find((level) => !level.locked)?.key || levels[0]?.key || "";
+  const [selectedKey, setSelectedKey] = useState(fallbackSelectedKey);
   const [submitting, setSubmitting] = useState(false);
-  const [advanceAfterKey, setAdvanceAfterKey] = useState<string | null>(null);
   const [result, setResult] = useState<null | {
     isCorrect: boolean;
     score: number;
@@ -67,32 +68,16 @@ export function ProgrammingGameClient({
   }>(null);
 
   const selectedLevel = useMemo(
-    () => levels.find((level) => level.key === selectedKey) || null,
-    [levels, selectedKey]
+    () =>
+      levels.find((level) => level.key === selectedKey && !level.locked) ||
+      levels.find((level) => level.key === fallbackSelectedKey) ||
+      levels.find((level) => !level.locked) ||
+      levels[0] ||
+      null,
+    [fallbackSelectedKey, levels, selectedKey]
   );
+  const activeSelectedKey = selectedLevel?.key || "";
   const nextLevel = levels.find((level) => level.key === summary.nextLevelKey) || null;
-
-  useEffect(() => {
-    if (!selectedLevel || selectedLevel.locked) {
-      setSelectedKey(initialSelectedKey);
-    }
-  }, [initialSelectedKey, selectedLevel]);
-
-  useEffect(() => {
-    if (!advanceAfterKey) {
-      return;
-    }
-
-    const updatedLevel = levels.find((level) => level.key === advanceAfterKey);
-
-    if (!updatedLevel?.progress?.completed) {
-      return;
-    }
-
-    setSelectedKey(summary.nextLevelKey || advanceAfterKey);
-    setResult(null);
-    setAdvanceAfterKey(null);
-  }, [advanceAfterKey, levels, summary.nextLevelKey]);
 
   async function submit(input: { answer: unknown; startedAt: string; hintsUsed: number }) {
     if (!selectedLevel) {
@@ -117,9 +102,6 @@ export function ProgrammingGameClient({
 
     if (response.ok) {
       setResult(data);
-      if (data.isCorrect) {
-        setAdvanceAfterKey(selectedLevel.key);
-      }
       router.refresh();
     }
   }
@@ -129,7 +111,7 @@ export function ProgrammingGameClient({
   }
 
   return (
-    <div className="grid gap-6 xl:grid-cols-[0.82fr_1.18fr]">
+    <div className="grid gap-6 xl:grid-cols-[0.82fr_1.18fr] 2xl:gap-8 2xl:grid-cols-[0.78fr_1.22fr]">
       <div className="space-y-5">
         <Card className="overflow-hidden bg-gradient-to-br from-white via-[#fff6e8] to-[#eef8ff]">
           <CardContent className="space-y-5 p-6">
@@ -179,7 +161,7 @@ export function ProgrammingGameClient({
                 }}
                 className={cn(
                   "w-full rounded-[26px] border px-5 py-4 text-left transition-all",
-                  selectedKey === level.key ? "border-pop-coral bg-orange-50" : "bg-white/85 hover:-translate-y-0.5",
+                  activeSelectedKey === level.key ? "border-pop-coral bg-orange-50" : "bg-white/85 hover:-translate-y-0.5",
                   level.locked && "cursor-not-allowed opacity-60 hover:translate-y-0"
                 )}
               >
@@ -215,7 +197,7 @@ export function ProgrammingGameClient({
         <Card className="bg-gradient-to-br from-white to-orange-50">
           <CardContent className="flex flex-wrap items-center justify-between gap-4 p-6">
             <div>
-              <p className="text-sm font-semibold uppercase tracking-wide text-pop-coral">Мини-игра</p>
+              <p className="text-sm font-semibold uppercase tracking-wide text-pop-coral">Scratch-приключение</p>
               <h2 className="text-3xl font-black text-pop-ink">{selectedLevel.title}</h2>
               <p className="mt-2 text-muted-foreground">{selectedLevel.description}</p>
             </div>
@@ -279,14 +261,24 @@ export function ProgrammingGameClient({
           ) : null}
         </AnimatePresence>
 
-        <InteractiveTaskRunner
-          assignmentType={selectedLevel.type}
-          content={selectedLevel.content}
-          onSubmit={submit}
-          submitLabel="Завершить уровень"
-          isSubmitting={submitting}
-          result={result}
-        />
+        {isScratchQuestContent(selectedLevel.content) ? (
+          <CodeQuestRunner
+            key={selectedLevel.key}
+            content={selectedLevel.content}
+            onSubmit={submit}
+            isSubmitting={submitting}
+          />
+        ) : (
+          <InteractiveTaskRunner
+            key={selectedLevel.key}
+            assignmentType={selectedLevel.type}
+            content={selectedLevel.content}
+            onSubmit={submit}
+            submitLabel="Завершить уровень"
+            isSubmitting={submitting}
+            result={result}
+          />
+        )}
       </div>
     </div>
   );

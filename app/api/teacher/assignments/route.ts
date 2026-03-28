@@ -2,10 +2,11 @@ import { AssignmentStatus, Prisma } from "@prisma/client";
 import { NextResponse } from "next/server";
 
 import {
+  formatTeacherAssignmentInputIssues,
   getAssignmentContentSchema,
   getLatestAttemptStats,
+  parseTeacherAssignmentInput,
   parseStoredAssignment,
-  teacherAssignmentInputSchema
 } from "@/lib/assignments";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
@@ -101,16 +102,71 @@ export async function POST(request: Request) {
   }
 
   const teacher = await getTeacherProfile(session.user.id);
-  const body = teacherAssignmentInputSchema.parse(await request.json());
+  const parsedBody = parseTeacherAssignmentInput(await request.json());
+  if (!parsedBody.success) {
+    return NextResponse.json(
+      {
+        message: formatTeacherAssignmentInputIssues(parsedBody.error)
+      },
+      { status: 400 }
+    );
+  }
+
+  const body = parsedBody.data;
   const parsedContent = getAssignmentContentSchema(body.assignmentType).parse(body.content);
-  const groups = await prisma.group.findMany({
-    where: {
-      teacherId: teacher.id,
-      id: {
-        in: body.groupIds
-      }
-    }
-  });
+  const requestedGroupIds = [...new Set(body.groupIds)];
+  const [groups, module, topic] = await Promise.all([
+    requestedGroupIds.length
+      ? prisma.group.findMany({
+          where: {
+            teacherId: teacher.id,
+            id: {
+              in: requestedGroupIds
+            }
+          }
+        })
+      : Promise.resolve([]),
+    body.moduleId
+      ? prisma.module.findUnique({
+          where: { id: body.moduleId },
+          select: { id: true }
+        })
+      : Promise.resolve(null),
+    body.topicId
+      ? prisma.topic.findUnique({
+          where: { id: body.topicId },
+          select: { id: true, moduleId: true }
+        })
+      : Promise.resolve(null)
+  ]);
+
+  if (requestedGroupIds.length !== groups.length) {
+    return NextResponse.json(
+      { message: "Выбрана одна или несколько недоступных групп." },
+      { status: 400 }
+    );
+  }
+
+  if (body.moduleId && !module) {
+    return NextResponse.json(
+      { message: "Выбранный модуль не найден." },
+      { status: 400 }
+    );
+  }
+
+  if (body.topicId && !topic) {
+    return NextResponse.json(
+      { message: "Выбранная тема не найдена." },
+      { status: 400 }
+    );
+  }
+
+  if (body.moduleId && topic && topic.moduleId !== body.moduleId) {
+    return NextResponse.json(
+      { message: "Тема не принадлежит выбранному модулю." },
+      { status: 400 }
+    );
+  }
 
   const assignment = await prisma.teacherAssignment.create({
     data: {

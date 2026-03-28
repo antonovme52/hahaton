@@ -1,6 +1,7 @@
 import { Prisma } from "@prisma/client";
 
 import { prisma } from "@/lib/prisma";
+import { getOrCreateStudentProfile } from "@/lib/profiles";
 import { AppRole } from "@/lib/roles";
 
 export type LeaderboardPeriod = "all" | "week" | "month";
@@ -118,8 +119,7 @@ async function getAllowedLeaderboardGroups(userId: string, role: AppRole) {
     }));
   }
 
-  const student = await prisma.studentProfile.findUniqueOrThrow({
-    where: { userId },
+  const student = await getOrCreateStudentProfile(userId, {
     include: {
       groupMemberships: {
         include: {

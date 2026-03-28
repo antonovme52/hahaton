@@ -1,6 +1,13 @@
 # Popub Learn
 
-Геймифицированная образовательная веб-платформа для школьников 10-15 лет по цифровой грамотности и основам программирования. Это full-stack MVP на `Next.js + PostgreSQL + Prisma` с рабочим сценарием для ученика и родителя.
+Геймифицированная образовательная платформа для школьников 10-15 лет по цифровой грамотности и основам программирования. Проект собран на `Next.js + PostgreSQL + Prisma` и включает сценарии для ученика, родителя и учителя.
+
+## Что нужно для запуска
+
+- `Node.js` и `npm`
+- `Docker` / `Docker Desktop`
+
+В репозитории есть `package-lock.json`, поэтому ниже используются команды через `npm`.
 
 ## Стек
 
@@ -12,63 +19,110 @@
 - Prisma ORM
 - NextAuth.js
 - Zustand
+- Vitest
 
 ## Возможности
 
-- Роли `student` и `parent`
-- Учебная структура `Модуль -> Тема -> Лекция -> Практика -> Домашнее задание`
+- роли `student`, `parent`, `teacher`
+- учебная структура `Модуль -> Тема -> Лекция -> Практика -> Домашнее задание`
 - XP, уровни, достижения и разблокировка контента
-- Отдельный кабинет родителя с прогрессом ребенка
-- Мини-игры и интерактивные задания
+- кабинет родителя с прогрессом ребенка
+- кабинет учителя с группами и заданиями
+- мини-игры и интерактивные задания
 
-## Локальный запуск
+## Быстрый старт
 
-1. Установить зависимости:
+1. Установите зависимости:
 
 ```bash
 npm install
 ```
 
-2. Создать `.env` по примеру `.env.example`.
-
-3. Поднять PostgreSQL через Docker:
+2. Создайте локальный файл окружения:
 
 ```bash
-docker compose up -d
+copy .env.example .env
 ```
 
-Если контейнер уже был создан раньше, достаточно:
+Если вы не на Windows, используйте:
 
 ```bash
-docker start postgres-popub
+cp .env.example .env
 ```
 
-База `popub_learn` создается автоматически из `docker-compose.yml`.
+3. Проверьте, что в `.env` стоят рабочие значения для локального Docker PostgreSQL:
 
-4. Сгенерировать Prisma Client:
+```env
+DATABASE_URL="postgresql://postgres:password@localhost:55432/popub_learn?schema=public"
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_SECRET="replace-with-a-long-random-secret"
+```
+
+`DATABASE_URL` должен совпадать с `docker-compose.yml`: база поднимается на порту `55432`, пользователь `postgres`, пароль `password`.
+
+4. Поднимите базу данных:
+
+```bash
+docker compose up -d db
+```
+
+5. Сгенерируйте Prisma Client:
 
 ```bash
 npm run prisma:generate
 ```
 
-5. Применить миграции:
+6. Примените миграции:
 
 ```bash
 npx prisma migrate deploy
 ```
 
-6. При необходимости заполнить базу seed-данными:
+7. Заполните базу демо-данными:
 
 ```bash
 npm run prisma:seed
 ```
 
-Важно: текущий `seed.ts` перед заполнением очищает таблицы, поэтому не запускайте его на базе с нужными данными.
+Важно: `prisma/seed.ts` перед заполнением очищает таблицы. Не запускайте seed на базе, где уже есть нужные данные.
 
-7. Запустить dev-сервер:
+8. Запустите проект:
 
 ```bash
 npm run dev
 ```
 
-Приложение будет доступно по адресу `http://localhost:3000`.
+После этого приложение будет доступно по адресу `http://localhost:3000`.
+
+## Тестовые аккаунты
+
+После `npm run prisma:seed` можно войти под готовыми пользователями:
+
+- `student@example.com` / `password123`
+- `parent@example.com` / `password123`
+- `teacher@example.com` / `password123`
+
+Страницы входа и регистрации:
+
+- `http://localhost:3000/login`
+- `http://localhost:3000/register`
+
+## Полезные команды
+
+```bash
+npm run dev             # локальная разработка
+npm run build           # production build
+npm run start           # запуск production build
+npm run test            # тесты один раз
+npm run test:watch      # тесты в watch-режиме
+npm run lint            # eslint
+npm run prisma:generate # пересоздать Prisma Client
+npm run prisma:migrate  # создать и применить новую миграцию в dev
+npm run prisma:seed     # заново заполнить БД демо-данными
+```
+
+## Если что-то не запускается
+
+- Проверьте, что контейнер PostgreSQL поднят: `docker compose ps`
+- Если порт `55432` занят, измените его в `docker-compose.yml` и в `DATABASE_URL`
+- Если Prisma ругается на подключение, сначала дождитесь запуска контейнера БД и повторите миграции

@@ -4,6 +4,7 @@ import { AppShell } from "@/components/layout/app-shell";
 import { StatCard } from "@/components/cards/stat-card";
 import { AchievementGrid } from "@/components/gamification/achievement-grid";
 import { Card, CardContent } from "@/components/ui/card";
+import { formatActivityLabel } from "@/lib/activity";
 import { getProfileData } from "@/lib/data";
 import { requireRole } from "@/lib/permissions";
 import { formatDate } from "@/lib/utils";
@@ -31,7 +32,7 @@ export default async function ProfilePage() {
             <div className="grid gap-3">
               {data.activity.map((entry) => (
                 <div key={entry.id} className="rounded-[24px] bg-white/80 p-4">
-                  <p className="font-semibold">{entry.type}</p>
+                  <p className="font-semibold">{formatActivityLabel(entry)}</p>
                   <p className="text-sm text-muted-foreground">{formatDate(entry.createdAt)}</p>
                 </div>
               ))}

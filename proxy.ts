@@ -1,6 +1,8 @@
 import nextAuthMiddleware from "next-auth/middleware";
 
-export default nextAuthMiddleware;
+export const proxy = nextAuthMiddleware;
+
+export default proxy;
 
 export const config = {
   matcher: [

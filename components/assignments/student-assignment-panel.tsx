@@ -105,6 +105,7 @@ export function StudentAssignmentPanel({
       </AnimatePresence>
 
       <InteractiveTaskRunner
+        key={assignmentId}
         assignmentType={assignmentType}
         content={content}
         onSubmit={submit}

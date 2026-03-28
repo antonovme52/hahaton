@@ -5,7 +5,7 @@ import { Loader2, UserPlus } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import { Button } from "@/components/ui/button";
@@ -35,6 +35,7 @@ export function RegisterForm() {
       role: "student"
     }
   });
+  const selectedRole = useWatch({ control: form.control, name: "role" });
 
   async function onSubmit(values: FormValues) {
     setError("");
@@ -92,7 +93,7 @@ export function RegisterForm() {
                   type="button"
                   onClick={() => form.setValue("role", value as "student" | "parent" | "teacher")}
                   className={`rounded-2xl border px-4 py-3 text-sm font-semibold ${
-                    form.watch("role") === value
+                    selectedRole === value
                       ? "border-pop-coral bg-orange-50 text-pop-coral"
                       : "bg-white/80 text-muted-foreground"
                   }`}

@@ -4,6 +4,7 @@ import { z } from "zod";
 import { evaluateAssignmentAnswer, parseStoredAssignment } from "@/lib/assignments";
 import { auth } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
+import { getOrCreateStudentProfile } from "@/lib/profiles";
 import { hasStudentEarnedAssignmentXp, grantStudentXp } from "@/lib/xp";
 
 const schema = z.object({
@@ -23,8 +24,7 @@ export async function POST(
 
   const { id } = await params;
   const body = schema.parse(await request.json());
-  const student = await prisma.studentProfile.findUniqueOrThrow({
-    where: { userId: session.user.id },
+  const student = await getOrCreateStudentProfile(session.user.id, {
     include: {
       groupMemberships: true
     }

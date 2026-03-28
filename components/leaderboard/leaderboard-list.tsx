@@ -22,25 +22,23 @@ function getRankTone(rank: number) {
   return "bg-pop-ink text-white";
 }
 
-function getRankIcon(rank: number) {
+function renderRankIcon(rank: number) {
   if (rank === 1) {
-    return Crown;
+    return <Crown className="h-4 w-4" />;
   }
 
   if (rank === 2) {
-    return Trophy;
+    return <Trophy className="h-4 w-4" />;
   }
 
   if (rank === 3) {
-    return Medal;
+    return <Medal className="h-4 w-4" />;
   }
 
-  return null;
+  return rank;
 }
 
 function LeaderboardRowItem({ row }: { row: LeaderboardRow }) {
-  const RankIcon = getRankIcon(row.rank);
-
   return (
     <li
       className={cn(
@@ -57,7 +55,7 @@ function LeaderboardRowItem({ row }: { row: LeaderboardRow }) {
             getRankTone(row.rank)
           )}
         >
-          {RankIcon ? <RankIcon className="h-4 w-4" /> : row.rank}
+          {renderRankIcon(row.rank)}
         </div>
         <div className="min-w-0 leading-tight">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Позиция</p>

@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { getProgrammingGameData } from "@/lib/portal-data";
 import { evaluateProgrammingLevel, getProgrammingGameLevel } from "@/lib/programming-game";
 import { prisma } from "@/lib/prisma";
+import { getOrCreateStudentProfile } from "@/lib/profiles";
 import { grantStudentXp } from "@/lib/xp";
 
 const schema = z.object({
@@ -39,9 +40,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Level not found" }, { status: 404 });
   }
 
-  const student = await prisma.studentProfile.findUniqueOrThrow({
-    where: { userId: session.user.id }
-  });
+  const student = await getOrCreateStudentProfile(session.user.id);
   const evaluation = evaluateProgrammingLevel(body.levelKey, body.answer);
   let xp = student.xp;
   let levelValue = student.level;

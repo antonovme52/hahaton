@@ -8,12 +8,15 @@ import {
 
 describe("programming game", () => {
   it("returns seeded levels", () => {
-    expect(getProgrammingGameLevel("loops-race")?.title).toBe("Loops Race");
+    expect(getProgrammingGameLevel("loops-race")?.title).toBe("Петля ускорения");
   });
 
   it("evaluates a correct level answer", () => {
     const result = evaluateProgrammingLevel("loops-race", {
-      gaps: ["1", "3", "steps"]
+      slotAnswers: {
+        count: "3",
+        action: "jump"
+      }
     });
 
     expect(result.isCorrect).toBe(true);
@@ -29,7 +32,20 @@ describe("programming game", () => {
 
   it("evaluates a correct bug-fix answer", () => {
     const result = evaluateProgrammingLevel("condition-rescue", {
-      code: "if (score >= 80) {\n  console.log('passed');\n}"
+      slotAnswers: {
+        condition: "green",
+        actionTrue: "move",
+        actionFalse: "wait"
+      }
+    });
+
+    expect(result.isCorrect).toBe(true);
+    expect(result.score).toBe(100);
+  });
+
+  it("evaluates a correct sequence answer for the final level", () => {
+    const result = evaluateProgrammingLevel("function-sprint", {
+      blockIds: ["start", "step-right", "step-right", "celebrate"]
     });
 
     expect(result.isCorrect).toBe(true);

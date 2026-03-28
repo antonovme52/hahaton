@@ -2,6 +2,7 @@ import { AssignmentStatus } from "@prisma/client";
 
 import { getAssignmentCategory, getLatestAttemptStats, parseStoredAssignment } from "@/lib/assignments";
 import { prisma } from "@/lib/prisma";
+import { getOrCreateStudentProfile } from "@/lib/profiles";
 import { buildProgrammingGameState } from "@/lib/programming-game";
 
 export async function getTeacherDashboardData(userId: string) {
@@ -133,8 +134,7 @@ export async function getTeacherAssignmentsWorkspaceData(userId: string) {
 }
 
 export async function getStudentAssignmentsData(userId: string) {
-  const student = await prisma.studentProfile.findUniqueOrThrow({
-    where: { userId },
+  const student = await getOrCreateStudentProfile(userId, {
     include: {
       user: true,
       groupMemberships: {
@@ -184,20 +184,21 @@ export async function getStudentAssignmentsData(userId: string) {
       })
     : [];
 
-  return {
+      return {
     student,
     assignments: assignments.map((assignment) => ({
       ...assignment,
       category: getAssignmentCategory(assignment.assignmentType),
       parsedContent: parseStoredAssignment(assignment),
-      latestAttempt: assignment.attempts[0] || null
+      latestAttempt: assignment.attempts[0] || null,
+      attemptCount: assignment.attempts.length,
+      hasCompletedAttempt: assignment.attempts.some((attempt) => attempt.isCorrect)
     }))
   };
 }
 
 export async function getStudentAssignmentDetails(userId: string, assignmentId: string) {
-  const student = await prisma.studentProfile.findUniqueOrThrow({
-    where: { userId },
+  const student = await getOrCreateStudentProfile(userId, {
     include: {
       user: true,
       groupMemberships: true
@@ -242,13 +243,14 @@ export async function getStudentAssignmentDetails(userId: string, assignmentId: 
     assignment,
     category: getAssignmentCategory(assignment.assignmentType),
     parsedContent: parseStoredAssignment(assignment),
-    latestAttempt: assignment.attempts[0] || null
+    latestAttempt: assignment.attempts[0] || null,
+    attemptCount: assignment.attempts.length,
+    hasCompletedAttempt: assignment.attempts.some((attempt) => attempt.isCorrect)
   };
 }
 
 export async function getProgrammingGameData(userId: string) {
-  const student = await prisma.studentProfile.findUniqueOrThrow({
-    where: { userId },
+  const student = await getOrCreateStudentProfile(userId, {
     include: {
       user: true,
       programmingProgress: true
