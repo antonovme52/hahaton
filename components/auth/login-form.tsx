@@ -11,8 +11,7 @@ import { z } from "zod"
 
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
+import { FloatingInput } from "@/components/ui/floating-input"
 
 const schema = z.object({
   email: z.string().email(),
@@ -60,15 +59,19 @@ export function LoginForm() {
         <CardDescription>Войди и продолжай обучение.</CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
+        <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
-            <Input id="email" type="email" {...form.register("email")} />
+            <FloatingInput id="email" label="Email" type="email" autoComplete="email" {...form.register("email")} />
             {form.formState.errors.email ? <p className="text-sm text-red-500">{form.formState.errors.email.message}</p> : null}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Пароль</Label>
-            <Input id="password" type="password" {...form.register("password")} />
+            <FloatingInput
+              id="password"
+              label="Пароль"
+              type="password"
+              autoComplete="current-password"
+              {...form.register("password")}
+            />
             {form.formState.errors.password ? <p className="text-sm text-red-500">{form.formState.errors.password.message}</p> : null}
           </div>
           {error ? <p className="text-sm text-red-500">{error}</p> : null}

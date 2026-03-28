@@ -1,3 +1,4 @@
+import { coerceAvatarForLevel } from "@/lib/avatars";
 import { prisma } from "@/lib/prisma";
 import { getOrCreateStudentProfile } from "@/lib/profiles";
 import { canAccessQuiz, getModuleProgress } from "@/lib/progress";
@@ -177,11 +178,20 @@ export async function getQuizDetails(userId: string, moduleSlug: string) {
 }
 
 export async function getProfileData(userId: string) {
-  const student = await getOrCreateStudentProfile(userId, {
+  let student = await getOrCreateStudentProfile(userId, {
     include: {
       user: true
     }
   });
+
+  const avatarFixed = coerceAvatarForLevel(student.avatar, student.level);
+  if (avatarFixed !== student.avatar) {
+    await prisma.studentProfile.update({
+      where: { id: student.id },
+      data: { avatar: avatarFixed }
+    });
+    student = { ...student, avatar: avatarFixed };
+  }
 
   const [achievements, allAchievements] = await Promise.all([
     prisma.userAchievement.findMany({

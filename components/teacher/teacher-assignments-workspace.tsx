@@ -96,7 +96,7 @@ type FormState = {
 };
 
 const selectClassName =
-  "h-12 w-full rounded-2xl border border-slate-200/90 bg-white/85 px-4 text-base text-slate-900 shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60";
+  "h-12 w-full rounded-2xl border-2 border-border bg-white/90 px-4 text-base text-slate-900 shadow-sm transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-not-allowed disabled:opacity-60";
 
 function createDefaultContent(type: AssignmentType) {
   switch (type) {
@@ -441,7 +441,7 @@ function StatTile({
   accentClassName: string;
 }) {
   return (
-    <div className="rounded-[28px] border border-white/70 bg-white/80 p-5 shadow-card backdrop-blur">
+    <div className="rounded-[28px] border-2 border-border bg-white/80 p-5 shadow-card backdrop-blur">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
@@ -468,7 +468,7 @@ function FormSection({
   children: ReactNode;
 }) {
   return (
-    <section className="rounded-[30px] border border-white/70 bg-white/75 p-5 shadow-sm backdrop-blur md:p-6">
+    <section className="rounded-[30px] border-2 border-border bg-white/75 p-5 shadow-sm backdrop-blur md:p-6">
       <div className="mb-5 space-y-2">
         {eyebrow ? (
           <p className="text-xs font-bold uppercase tracking-[0.22em] text-pop-coral">{eyebrow}</p>
@@ -680,7 +680,7 @@ export function TeacherAssignmentsWorkspace({
       <div className={cn("grid gap-6", showLibrary ? "xl:grid-cols-[390px_minmax(0,1fr)]" : "grid-cols-1")}>
         {showLibrary ? (
           <Card className="self-start overflow-hidden xl:sticky xl:top-6">
-          <CardHeader className="space-y-5 border-b border-white/70 bg-gradient-to-br from-white via-white to-accent/25">
+          <CardHeader className="space-y-5 border-b-2 border-border bg-gradient-to-br from-white via-white to-accent/25">
             <div className="flex items-start justify-between gap-4">
               <div>
                 <CardTitle className="text-[1.8rem]">Библиотека заданий</CardTitle>
@@ -745,7 +745,7 @@ export function TeacherAssignmentsWorkspace({
               ))}
             </div>
 
-            <div className="flex items-center justify-between rounded-[22px] border border-slate-200/70 bg-white/70 px-4 py-3 text-sm">
+            <div className="flex items-center justify-between rounded-[22px] border-2 border-border bg-white/75 px-4 py-3 text-sm">
               <span className="font-medium text-slate-700">
                 Показано {visibleAssignments.length} из {assignments.length}
               </span>
@@ -879,7 +879,7 @@ export function TeacherAssignmentsWorkspace({
         ) : null}
 
         <Card className="overflow-hidden">
-          <CardHeader className="space-y-5 border-b border-white/70 bg-gradient-to-br from-white via-orange-50/40 to-sky-50/80">
+          <CardHeader className="space-y-5 border-b-2 border-border bg-gradient-to-br from-white via-orange-50/40 to-sky-50/80">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
               <div>
                 <CardTitle className="text-[1.9rem]">
@@ -901,7 +901,7 @@ export function TeacherAssignmentsWorkspace({
             </div>
 
             <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_340px]">
-              <div className="rounded-[30px] border border-white/70 bg-white/80 p-5 shadow-card backdrop-blur md:p-6">
+              <div className="rounded-[30px] border-2 border-border bg-white/80 p-5 shadow-card backdrop-blur md:p-6">
                 <div className="flex flex-wrap items-center gap-2">
                   <Badge variant={isProgrammingAssignmentType(form.assignmentType) ? "reward" : "outline"}>
                     {assignmentCategoryLabels[isProgrammingAssignmentType(form.assignmentType) ? "programming" : "general"]}
@@ -946,7 +946,7 @@ export function TeacherAssignmentsWorkspace({
                 </div>
               </div>
 
-              <div className="rounded-[30px] border border-white/70 bg-white/80 p-5 shadow-card backdrop-blur md:p-6">
+              <div className="rounded-[30px] border-2 border-border bg-white/80 p-5 shadow-card backdrop-blur md:p-6">
                 <p className="text-xs font-bold uppercase tracking-[0.22em] text-pop-coral">Подсказка по типу</p>
                 <h3 className="mt-3 text-xl font-black text-pop-ink">{guidance.title}</h3>
                 <p className="mt-2 text-sm text-muted-foreground">{guidance.description}</p>
@@ -1492,7 +1492,7 @@ export function TeacherAssignmentsWorkspace({
               </div>
 
               <div className="space-y-4">
-                <div className="rounded-[30px] border border-white/70 bg-white/80 p-5 shadow-card backdrop-blur md:p-6">
+                <div className="rounded-[30px] border-2 border-border bg-white/80 p-5 shadow-card backdrop-blur md:p-6">
                   <p className="text-xs font-bold uppercase tracking-[0.22em] text-pop-coral">Быстрая сводка</p>
                   <div className="mt-4 space-y-3">
                     <div className="flex items-center justify-between rounded-[20px] bg-slate-50 px-4 py-3">
@@ -1519,7 +1519,7 @@ export function TeacherAssignmentsWorkspace({
                   </div>
                 </div>
 
-                <div className="rounded-[30px] border border-white/70 bg-white/80 p-5 shadow-card backdrop-blur md:p-6">
+                <div className="rounded-[30px] border-2 border-border bg-white/80 p-5 shadow-card backdrop-blur md:p-6">
                   <p className="text-xs font-bold uppercase tracking-[0.22em] text-pop-coral">Чек-лист готовности</p>
                   <div className="mt-4 space-y-3">
                     {readinessItems.map((item) => (
@@ -1536,7 +1536,7 @@ export function TeacherAssignmentsWorkspace({
                   </div>
                 </div>
 
-                <div className="rounded-[30px] border border-white/70 bg-gradient-to-br from-orange-50 via-white to-sky-50 p-5 shadow-card md:p-6">
+                <div className="rounded-[30px] border-2 border-border bg-gradient-to-br from-orange-50 via-white to-sky-50 p-5 shadow-card md:p-6">
                   <p className="text-xs font-bold uppercase tracking-[0.22em] text-pop-coral">Текущий план</p>
                   <h3 className="mt-3 text-xl font-black text-pop-ink">
                     {form.status === AssignmentStatus.published ? "Задание готово к выдаче" : "Задание в подготовке"}

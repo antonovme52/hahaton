@@ -1,6 +1,7 @@
 import { AchievementGrid } from "@/components/gamification/achievement-grid"
 import { AppShell } from "@/components/layout/app-shell"
 import { ChildOverviewCard } from "@/components/parent/child-overview-card"
+import { ParentProgressCharts } from "@/components/parent/parent-progress-charts"
 import { ParentChildLinkCard } from "@/components/parent/parent-child-link-card"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -44,46 +45,27 @@ export default async function ParentDashboardPage() {
           activity={data.recentActivity[0] ? formatDate(data.recentActivity[0].createdAt) : "нет данных"}
         />
 
-        <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
-          <Card>
-            <CardHeader>
-              <CardTitle>Прогресс по модулям</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {data.moduleStats.map((item) => (
-                <div key={item.module.id} className="rounded-[24px] bg-white/80 p-4">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-semibold">{item.module.title}</h3>
-                    <span className="text-sm font-semibold">{Math.round(item.progress.progress)}%</span>
-                  </div>
-                  <p className="mt-2 text-sm text-muted-foreground">
-                    Завершено {item.progress.completedTopics} из {item.progress.totalTopics}
+        <ParentProgressCharts moduleStats={data.moduleStats} assignmentSummary={data.assignmentSummary} />
+
+        <Card className="lg:max-w-3xl">
+          <CardHeader>
+            <CardTitle>Последние тесты</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {data.child.quizAttempts.length ? (
+              data.child.quizAttempts.map((attempt) => (
+                <div key={attempt.id} className="rounded-[24px] bg-white/80 p-4">
+                  <p className="font-semibold">{attempt.quiz.module.title}</p>
+                  <p className="text-sm text-muted-foreground">
+                    Результат: {attempt.score}% • {attempt.passed ? "сдан" : "не сдан"}
                   </p>
                 </div>
-              ))}
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardHeader>
-              <CardTitle>Последние тесты</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {data.child.quizAttempts.length ? (
-                data.child.quizAttempts.map((attempt) => (
-                  <div key={attempt.id} className="rounded-[24px] bg-white/80 p-4">
-                    <p className="font-semibold">{attempt.quiz.module.title}</p>
-                    <p className="text-sm text-muted-foreground">
-                      Результат: {attempt.score}% • {attempt.passed ? "сдан" : "не сдан"}
-                    </p>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm text-muted-foreground">Тестов пока нет.</p>
-              )}
-            </CardContent>
-          </Card>
-        </div>
+              ))
+            ) : (
+              <p className="text-sm text-muted-foreground">Тестов пока нет.</p>
+            )}
+          </CardContent>
+        </Card>
 
         <section className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">

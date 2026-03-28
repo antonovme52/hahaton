@@ -58,7 +58,13 @@ const config: Config = {
           "radial-gradient(circle at top left, rgba(143, 168, 255, 0.18), transparent 30%), radial-gradient(circle at bottom right, rgba(158, 216, 255, 0.22), transparent 28%)"
       },
       fontFamily: {
-        sans: ["var(--font-sans)"]
+        sans: ["var(--font-sans)", "system-ui", "sans-serif"]
+      },
+      fontSize: {
+        sm: ["1rem", { lineHeight: "1.5rem" }],
+        base: ["1.125rem", { lineHeight: "1.75rem" }],
+        lg: ["1.25rem", { lineHeight: "1.875rem" }],
+        xl: ["1.375rem", { lineHeight: "1.875rem" }]
       }
     }
   },

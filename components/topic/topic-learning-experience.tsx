@@ -146,8 +146,8 @@ export function TopicLearningExperience({
       </div>
 
       <div>
-        <h1 className="text-4xl font-black text-pop-ink">{topicTitle}</h1>
-        <p className="mt-2 max-w-3xl text-muted-foreground">{topicDescription}</p>
+        <h1 className="text-4xl font-black leading-snug text-pop-ink sm:text-5xl">{topicTitle}</h1>
+        <p className="mt-2 max-w-3xl text-lg text-muted-foreground">{topicDescription}</p>
       </div>
 
       <AnimatePresence mode="wait">
@@ -159,9 +159,9 @@ export function TopicLearningExperience({
             exit={{ opacity: 0, y: -18 }}
             className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_320px]"
           >
-            <Card className="overflow-hidden border-white/70 bg-white/85">
+            <Card className="overflow-hidden border-2 border-border bg-white/90">
               <CardContent className="flex min-h-[320px] flex-col items-center justify-center gap-6 p-8 text-center">
-                <Badge variant="reward" className="px-4 py-2 text-sm">
+                <Badge variant="reward" className="px-4 py-2 text-base">
                   Начинаем изучение темы
                 </Badge>
                 <AnimatePresence mode="wait">
@@ -176,7 +176,7 @@ export function TopicLearningExperience({
                     {countdownFrames[countdownIndex]}
                   </motion.div>
                 </AnimatePresence>
-                <p className="max-w-xl text-sm leading-6 text-muted-foreground sm:text-base">
+                <p className="max-w-xl text-base leading-7 text-muted-foreground sm:text-lg sm:leading-8">
                   Сначала коротко разберём идею, затем потренируемся и после этого закрепим тему домашним заданием.
                 </p>
               </CardContent>
@@ -199,7 +199,7 @@ export function TopicLearningExperience({
                     type="button"
                     onClick={() => setActiveTab(tab.id)}
                     className={cn(
-                      "rounded-full border px-5 py-3 text-sm font-semibold transition-all",
+                      "rounded-full border px-5 py-3 text-base font-semibold transition-all",
                       activeTab === tab.id
                         ? "border-pop-ink bg-pop-ink text-white shadow-card"
                         : "bg-white/80 text-foreground hover:-translate-y-0.5 hover:bg-accent"
@@ -210,7 +210,7 @@ export function TopicLearningExperience({
                 ))}
               </div>
 
-              <div className="relative overflow-hidden rounded-[32px] border border-white/60 bg-white/65 p-2 shadow-card">
+              <div className="relative overflow-hidden rounded-[32px] border-2 border-border bg-white/75 p-2 shadow-card ring-1 ring-pop-ink/8">
                 <AnimatePresence mode="wait">
                   {activeTab === "lecture" ? (
                     <motion.section
@@ -224,7 +224,7 @@ export function TopicLearningExperience({
                         <CardContent className="space-y-5 p-6">
                           <div className="flex items-center gap-3">
                             <Badge variant="info">Лекция</Badge>
-                            <p className="text-sm text-muted-foreground">Короткие блоки с основными идеями.</p>
+                            <p className="text-base text-muted-foreground">Короткие блоки с основными идеями.</p>
                           </div>
                           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
                             {lectureBlocks.map((block, index) => (
@@ -235,8 +235,8 @@ export function TopicLearningExperience({
                                 transition={{ duration: 0.24, delay: index * 0.05 }}
                                 className="rounded-[24px] bg-gradient-to-br from-white to-sky-50 p-5"
                               >
-                                <h2 className="text-lg font-semibold">{block.title}</h2>
-                                <p className="mt-3 text-sm leading-6 text-muted-foreground">{block.body}</p>
+                                <h2 className="text-xl font-semibold leading-snug">{block.title}</h2>
+                                <p className="mt-3 text-base leading-7 text-muted-foreground">{block.body}</p>
                               </motion.div>
                             ))}
                           </div>
@@ -257,7 +257,7 @@ export function TopicLearningExperience({
                         <CardContent className="space-y-5 p-6">
                           <div className="flex flex-wrap items-center gap-3">
                             <Badge variant="reward">Практика</Badge>
-                            <p className="text-sm text-muted-foreground">Сделай задание, затем откроется путь к ДЗ.</p>
+                            <p className="text-base text-muted-foreground">Сделай задание, затем откроется путь к ДЗ.</p>
                           </div>
                           {completed ? (
                             <div className="rounded-[24px] bg-secondary p-5 text-secondary-foreground">
@@ -296,8 +296,8 @@ export function TopicLearningExperience({
                           </div>
 
                           <div className="rounded-[24px] bg-white/80 p-5">
-                            <h2 className="text-lg font-semibold">Краткое закрепление</h2>
-                            <p className="mt-3 text-sm leading-6 text-muted-foreground">{homeworkDescription}</p>
+                            <h2 className="text-xl font-semibold leading-snug">Краткое закрепление</h2>
+                            <p className="mt-3 text-base leading-7 text-muted-foreground">{homeworkDescription}</p>
                           </div>
 
                           {completed ? (
@@ -305,7 +305,7 @@ export function TopicLearningExperience({
                               <p>Тема уже завершена, ответ сохранён.</p>
                               <Link
                                 href={`/modules/${moduleSlug}`}
-                                className="mt-4 inline-flex text-sm font-semibold underline underline-offset-4"
+                                className="mt-4 inline-flex text-base font-semibold underline underline-offset-4"
                               >
                                 Вернуться к модулю
                               </Link>
@@ -313,7 +313,7 @@ export function TopicLearningExperience({
                           ) : (
                             <Card>
                               <CardContent className="space-y-4 p-6">
-                                <p className="text-sm text-muted-foreground">
+                                <p className="text-base text-muted-foreground">
                                   Напиши короткий ответ, чтобы закрепить тему и получить награду.
                                 </p>
                                 <Textarea
@@ -347,14 +347,14 @@ export function TopicLearningExperience({
                                       </Badge>
                                       <Badge variant="info">Уровень: {result.level}</Badge>
                                     </div>
-                                    <p className="text-sm">
+                                    <p className="text-base">
                                       XP всего: <XpCounter value={result.xp} />.
                                     </p>
                                     {result.unlocked.length ? (
-                                      <p className="mt-2 text-sm">Новые достижения: {result.unlocked.join(", ")}.</p>
+                                      <p className="mt-2 text-base">Новые достижения: {result.unlocked.join(", ")}.</p>
                                     ) : null}
                                     {result.quizUnlocked ? (
-                                      <p className="mt-2 text-sm">Контрольный тест по модулю теперь открыт.</p>
+                                      <p className="mt-2 text-base">Контрольный тест по модулю теперь открыт.</p>
                                     ) : null}
                                   </div>
                                 ) : null}
@@ -379,9 +379,9 @@ export function TopicLearningExperience({
 
 function MascotPanel({ text }: { text: string }) {
   return (
-    <Card className="overflow-hidden border-white/70 bg-gradient-to-b from-white via-[#fff6e8] to-[#eef8ff]">
+    <Card className="overflow-hidden border-2 border-border bg-gradient-to-b from-white via-[#fff6e8] to-[#eef8ff] ring-1 ring-pop-ink/8">
       <CardContent className="flex h-full flex-col justify-between gap-5 p-6">
-        <div className="flex items-center gap-2 text-sm font-semibold text-pop-ink">
+        <div className="flex items-center gap-2 text-base font-semibold text-pop-ink">
           <WandSparkles className="h-4 w-4 text-pop-coral" />
           Подсказка от Луми
         </div>
@@ -404,7 +404,7 @@ function MascotPanel({ text }: { text: string }) {
           <div className="absolute right-[52px] bottom-3 h-16 w-12 rounded-full bg-[#fff1df]" />
         </div>
 
-        <div className="rounded-[24px] bg-white/85 p-4 text-sm leading-6 text-muted-foreground">
+        <div className="rounded-[24px] bg-white/85 p-4 text-base leading-7 text-muted-foreground">
           {text}
         </div>
       </CardContent>

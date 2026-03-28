@@ -3,6 +3,8 @@ import { Award, Flame, Lock, Medal, Sparkles, Star, Trophy } from "lucide-react"
 import { StatCard } from "@/components/cards/stat-card"
 import { AchievementGrid } from "@/components/gamification/achievement-grid"
 import { AppShell } from "@/components/layout/app-shell"
+import { AvatarPicker } from "@/components/profile/avatar-picker"
+import { VkNotifySettings } from "@/components/profile/vk-notify-settings"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent } from "@/components/ui/card"
 import { getProfileData } from "@/lib/data"
@@ -32,6 +34,14 @@ export default async function ProfilePage() {
           <StatCard label="Серия" value={`${data.student.streak} дня`} helper="Считается по дням активности" icon={Flame} tone="from-pop-plum to-pop-sky" />
         </div>
 
+        <AvatarPicker
+          userName={data.student.user.name}
+          currentAvatarId={data.student.avatar}
+          level={data.student.level}
+        />
+
+        <VkNotifySettings initialVkUserId={data.student.vkUserId} />
+
         <section className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
             <h2 className="text-2xl font-bold text-pop-ink">Открытые достижения</h2>
@@ -50,7 +60,7 @@ export default async function ProfilePage() {
               const Icon = achievementIconMap[achievement.icon as keyof typeof achievementIconMap] || Award
 
               return (
-                <Card key={achievement.id} className="border-dashed border-white/80 bg-white/70 opacity-90">
+                <Card key={achievement.id} className="border-2 border-dashed border-border bg-white/80 opacity-95 shadow-sm">
                   <CardContent className="space-y-3 p-5">
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-accent text-accent-foreground">
                       <Icon className="h-6 w-6 opacity-80" />

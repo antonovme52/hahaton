@@ -70,6 +70,7 @@ model StudentProfile {
   id                  String                    @id @default(cuid())
   userId              String                    @unique
   avatar              String?
+  vkUserId            String?
   xp                  Int                       @default(0)
   level               Int                       @default(1)
   streak              Int                       @default(0)

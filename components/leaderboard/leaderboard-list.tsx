@@ -42,13 +42,13 @@ function LeaderboardRowItem({ row }: { row: LeaderboardRow }) {
   return (
     <li
       className={cn(
-        "grid gap-3 rounded-[26px] border p-4 transition md:grid-cols-[112px_minmax(0,1fr)_132px] md:items-center md:gap-4 md:p-5",
+        "grid gap-3 rounded-[26px] border p-4 transition md:grid-cols-[10.5rem_minmax(0,1fr)_8.25rem] md:items-center md:gap-x-5 md:gap-y-3 md:p-5",
         row.isCurrentUser
           ? "border-pop-coral bg-orange-50/90 shadow-card"
           : "border-white/70 bg-white/70"
       )}
     >
-      <div className="flex items-center gap-3 rounded-[22px] bg-white/70 px-3 py-3 md:bg-transparent md:px-0 md:py-0">
+      <div className="flex min-w-0 items-center gap-3 rounded-[22px] bg-white/70 px-3 py-3 md:max-w-none md:bg-transparent md:px-0 md:py-0">
         <div
           className={cn(
             "flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl text-base font-black shadow-sm",
@@ -57,14 +57,18 @@ function LeaderboardRowItem({ row }: { row: LeaderboardRow }) {
         >
           {renderRankIcon(row.rank)}
         </div>
-        <div className="min-w-0 leading-tight">
+        <div className="min-w-0 shrink leading-tight">
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-muted-foreground">Позиция</p>
-          <p className="mt-1 text-lg font-black text-pop-ink">#{row.rank}</p>
+          <p className="mt-1 text-lg font-black text-pop-ink tabular-nums">#{row.rank}</p>
         </div>
       </div>
 
-      <div className="flex min-w-0 items-start gap-3 sm:items-center sm:gap-4">
-        <AvatarBadge avatar={row.avatar} name={row.name} className="h-12 w-12 rounded-[20px] sm:h-14 sm:w-14 sm:rounded-[22px]" />
+      <div className="flex min-w-0 items-start gap-3 pl-0 md:pl-1 sm:items-center sm:gap-4">
+        <AvatarBadge
+          avatar={row.avatar}
+          name={row.name}
+          className="h-12 w-12 shrink-0 rounded-[20px] sm:h-14 sm:w-14 sm:rounded-[22px]"
+        />
         <div className="min-w-0">
           <p className="truncate text-base font-semibold text-pop-ink sm:text-lg">{row.name}</p>
           {row.isCurrentUser ? <Badge variant="reward">Текущий пользователь</Badge> : null}
@@ -125,7 +129,7 @@ export function LeaderboardList({
         <CardContent className="space-y-4">
           {rows.length ? (
             <>
-              <div className="hidden grid-cols-[112px_minmax(0,1fr)_132px] px-5 text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground md:grid">
+              <div className="hidden grid-cols-[10.5rem_minmax(0,1fr)_8.25rem] gap-x-5 px-5 text-xs font-semibold uppercase tracking-[0.24em] text-muted-foreground md:grid">
                 <span>Место</span>
                 <span>Участник</span>
                 <span className="text-right">XP</span>

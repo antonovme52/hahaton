@@ -33,7 +33,7 @@ function SummaryCard({
   icon: typeof BookOpen;
 }) {
   return (
-    <div className="rounded-[28px] border border-white/70 bg-white/85 p-5 shadow-card">
+    <div className="rounded-[28px] border-2 border-border bg-white/85 p-5 shadow-card">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="text-sm font-semibold uppercase tracking-[0.18em] text-slate-500">{label}</p>
@@ -71,7 +71,7 @@ export function TeacherAssignmentsStats({
   return (
     <div className="space-y-6">
       <Card>
-        <CardHeader className="border-b border-white/70 bg-gradient-to-br from-white via-white to-accent/20">
+        <CardHeader className="border-b-2 border-border bg-gradient-to-br from-white via-white to-accent/20">
           <CardTitle className="text-[1.9rem]">Статистика заданий</CardTitle>
           <CardDescription className="max-w-2xl">
             Здесь только аналитика: смотри, какие задания работают хорошо, где падает точность и что стоит доработать.
@@ -106,7 +106,7 @@ export function TeacherAssignmentsStats({
           </div>
 
           <div className="grid gap-6 xl:grid-cols-2">
-            <div className="rounded-[30px] border border-white/70 bg-white/80 p-5 shadow-card">
+            <div className="rounded-[30px] border-2 border-border bg-white/80 p-5 shadow-card">
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-pop-coral">Требуют внимания</p>
               <div className="mt-4 space-y-3">
                 {needsAttention.length ? (
@@ -133,7 +133,7 @@ export function TeacherAssignmentsStats({
               </div>
             </div>
 
-            <div className="rounded-[30px] border border-white/70 bg-white/80 p-5 shadow-card">
+            <div className="rounded-[30px] border-2 border-border bg-white/80 p-5 shadow-card">
               <p className="text-xs font-bold uppercase tracking-[0.22em] text-pop-coral">Лучшие результаты</p>
               <div className="mt-4 space-y-3">
                 {bestResults.length ? (
@@ -161,7 +161,7 @@ export function TeacherAssignmentsStats({
             </div>
           </div>
 
-          <div className="rounded-[30px] border border-white/70 bg-white/80 p-5 shadow-card">
+          <div className="rounded-[30px] border-2 border-border bg-white/80 p-5 shadow-card">
             <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
               <div>
                 <p className="text-xs font-bold uppercase tracking-[0.22em] text-pop-coral">По каждому заданию</p>

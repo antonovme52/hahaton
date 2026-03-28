@@ -9,6 +9,7 @@ import {
   parseStoredAssignment,
 } from "@/lib/assignments";
 import { auth } from "@/lib/auth";
+import { notifyPublishedAssignmentVk } from "@/lib/notify-assignment-vk";
 import { prisma } from "@/lib/prisma";
 
 async function getTeacherProfile(userId: string) {
@@ -204,6 +205,12 @@ export async function POST(request: Request) {
       }
     }
   });
+
+  if (body.status === AssignmentStatus.published) {
+    void notifyPublishedAssignmentVk(assignment.id).catch((err) => {
+      console.error("[vk] notify assignment", err);
+    });
+  }
 
   return NextResponse.json(assignment, { status: 201 });
 }

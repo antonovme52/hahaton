@@ -33,7 +33,7 @@ export function MainNav({ role }: { role: AppRole }) {
           key={link.href}
           href={link.href}
           className={cn(
-            "rounded-full px-5 py-3 text-base font-medium text-muted-foreground hover:bg-white hover:text-foreground"
+            "rounded-full border border-transparent px-5 py-3 text-lg font-medium text-muted-foreground hover:border-border hover:bg-white hover:text-foreground"
           )}
         >
           {link.label}

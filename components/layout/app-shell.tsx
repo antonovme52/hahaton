@@ -14,7 +14,7 @@ export function AppShell({
 }) {
   return (
     <div className="min-h-screen">
-      <header className="border-b border-white/60 bg-white/70 backdrop-blur">
+      <header className="border-b-2 border-border bg-white/75 backdrop-blur">
         <div className="mx-auto flex max-w-[1680px] items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8 2xl:max-w-[1760px] 2xl:px-10">
           <Link href="/" className="flex items-center gap-4 font-semibold text-pop-ink">
             <span className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-[22px] bg-white shadow-sm ring-1 ring-black/5">
@@ -22,7 +22,7 @@ export function AppShell({
             </span>
             <span>
               Popub Learn
-              <span className="block text-sm font-medium text-muted-foreground">Цифровая грамотность и код</span>
+              <span className="block text-base font-medium text-muted-foreground">Цифровая грамотность и код</span>
             </span>
           </Link>
           <div className="flex items-center gap-3">

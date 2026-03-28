@@ -1,4 +1,5 @@
 import { AppShell } from "@/components/layout/app-shell"
+import { ParentProgressCharts } from "@/components/parent/parent-progress-charts"
 import { ParentChildLinkCard } from "@/components/parent/parent-child-link-card"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -33,6 +34,9 @@ export default async function ChildProgressPage() {
           <h1 className="text-4xl font-black text-pop-ink">Подробный прогресс</h1>
           <p className="mt-2 text-muted-foreground">Темы, задания и активность ребенка.</p>
         </div>
+
+        <ParentProgressCharts moduleStats={data.moduleStats} assignmentSummary={data.assignmentSummary} />
+
         <div className="grid gap-6 lg:grid-cols-2">
           <Card>
             <CardHeader>

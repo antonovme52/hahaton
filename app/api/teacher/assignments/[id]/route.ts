@@ -8,6 +8,7 @@ import {
   parseStoredAssignment,
 } from "@/lib/assignments";
 import { auth } from "@/lib/auth";
+import { notifyPublishedAssignmentVk } from "@/lib/notify-assignment-vk";
 import { prisma } from "@/lib/prisma";
 
 async function getOwnedAssignment(userId: string, assignmentId: string) {
@@ -65,7 +66,8 @@ export async function PATCH(
   }
 
   const { id } = await params;
-  const { teacher } = await getOwnedAssignment(session.user.id, id);
+  const { teacher, assignment: existing } = await getOwnedAssignment(session.user.id, id);
+  const wasPublished = existing.status === AssignmentStatus.published;
   const parsedBody = parseTeacherAssignmentInput(await request.json());
   if (!parsedBody.success) {
     return NextResponse.json(
@@ -169,6 +171,12 @@ export async function PATCH(
       }
     }
   });
+
+  if (body.status === AssignmentStatus.published && !wasPublished) {
+    void notifyPublishedAssignmentVk(assignment.id).catch((err) => {
+      console.error("[vk] notify assignment", err);
+    });
+  }
 
   return NextResponse.json(assignment);
 }

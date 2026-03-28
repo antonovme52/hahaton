@@ -1,18 +1,5 @@
-import { Rocket, Sparkles, Star } from "lucide-react";
-
 import { cn } from "@/lib/utils";
-
-const iconMap = {
-  rocket: Rocket,
-  spark: Sparkles,
-  comet: Star
-};
-
-const toneMap = {
-  rocket: "from-pop-coral to-pop-sun",
-  spark: "from-pop-sky to-cyan-500",
-  comet: "from-pop-plum to-fuchsia-500"
-};
+import { getAvatarEntry } from "@/lib/avatars";
 
 export function AvatarBadge({
   avatar,
@@ -23,9 +10,8 @@ export function AvatarBadge({
   name: string;
   className?: string;
 }) {
-  const key = (avatar || "spark") as keyof typeof iconMap;
-  const Icon = iconMap[key] || Sparkles;
-  const tone = toneMap[key] || toneMap.spark;
+  const hasAvatar = Boolean(avatar);
+  const { Icon, tone } = getAvatarEntry(avatar);
   const fallback = name
     .split(" ")
     .map((part) => part[0])
@@ -41,7 +27,11 @@ export function AvatarBadge({
       )}
       aria-label={name}
     >
-      {avatar ? <Icon className="h-7 w-7" /> : <span className="text-base font-black">{fallback}</span>}
+      {hasAvatar ? (
+        <Icon className="h-7 w-7" />
+      ) : (
+        <span className="text-base font-black">{fallback}</span>
+      )}
     </div>
   );
 }

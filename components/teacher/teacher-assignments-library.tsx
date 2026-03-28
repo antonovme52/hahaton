@@ -80,7 +80,7 @@ export function TeacherAssignmentsLibrary({
 
   return (
     <Card className="overflow-hidden">
-      <CardHeader className="space-y-5 border-b border-white/70 bg-gradient-to-br from-white via-white to-accent/25">
+      <CardHeader className="space-y-5 border-b-2 border-border bg-gradient-to-br from-white via-white to-accent/25">
         <div className="flex flex-col gap-4 xl:flex-row xl:items-start xl:justify-between">
           <div>
             <CardTitle className="text-[1.9rem]">Библиотека заданий</CardTitle>

@@ -22,9 +22,9 @@ export function ContinueLearningCard({
           <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/10">
             <Rocket className="h-6 w-6" />
           </div>
-          <p className="text-sm text-white/70">Продолжить обучение</p>
-          <h2 className="mt-2 text-2xl font-bold">{title}</h2>
-          <p className="mt-2 text-sm text-white/70">{moduleTitle}</p>
+          <p className="text-base text-white/70">Продолжить обучение</p>
+          <h2 className="mt-2 text-3xl font-bold leading-snug">{title}</h2>
+          <p className="mt-2 text-base text-white/70">{moduleTitle}</p>
         </div>
         <Button asChild variant="secondary" className="self-start md:self-center">
           <Link href={`/modules/${moduleSlug}/topics/${topicSlug}`} className="gap-2">
